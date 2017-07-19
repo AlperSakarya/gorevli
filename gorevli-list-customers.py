@@ -3,8 +3,7 @@ from __future__ import print_function
 import squareconnect
 from squareconnect.apis.customers_api import CustomersApi
 from squareconnect.rest import ApiException
-
-squareconnect.configuration.access_token = 'sq0atp-CEvvkko4WZCqoQ_lEYi_ew'
+import auth
 
 api_instance = CustomersApi()
 
