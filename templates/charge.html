@@ -1,0 +1,21 @@
+{% extends "layout.html" %}
+{% block content %}
+
+
+    {% if exception == "" %}
+           <p><h2>Tesekkurler, ${{ amount }} basariyla alindi! </h2></p>
+            Isim: {{ isim }}<br>
+            Telefon: {{ telefon }}<br>
+            Email: {{ email }}<br>
+
+
+        {%else%}
+        <p><h2>Odemede bir HATA olustu! Tekrar deneyiniz</h2></p>
+        <p><h3>Butun kutulari doldurmayi unutmayiniz.</h3></p>
+
+        <h3>Detaylar:</h3><br>
+        {{ exception }}
+
+    {%endif%}
+
+{% endblock %}

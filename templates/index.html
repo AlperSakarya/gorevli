@@ -1,0 +1,44 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<table border="1px">
+    <tr>
+        <td>
+            <form action="charge" method="post">
+                <article>
+                <p><h1>BAGIS FORMU</h1></p>
+                Isim:<br>
+                <input type="text" name="memberName"><br><p>
+                Email:<br>
+                <input type="text" name="notificationEmail"><br><p>
+                Telefon:<br>
+                <input type="text" name="phoneNumber"><br><p>
+                Miktar:<br>
+                <input type="radio" name="donationAmount" value="25"> $25.00 <br>
+                <input type="radio" name="donationAmount" value="50"> $50.00 <br>
+                <input type="radio" name="donationAmount" value="100">$100.00 <br>
+                <input type="text" name="donationAmount">
+                </article>
+                <input type="submit" value="Bagis Yap">
+            </form>
+        </td>
+
+        <td>
+            <form action="signup" method="post">
+                <article>
+                <p><h1>UYELIK FORMU</h1></p>
+                Isim:<br>
+                <input type="text" name="memberName"><br><p>
+                Email:<br>
+                <input type="text" name="notificationEmail"><br><p>
+                Telefon:<br>
+                <input type="text" name="phoneNumber"><br><p>
+                </article>
+                <input type="submit" value="Uye Ol">
+            </form>
+        </td>
+    </tr>
+</table>
+
+
+{% endblock %}
