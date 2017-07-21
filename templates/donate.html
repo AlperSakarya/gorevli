@@ -18,7 +18,7 @@
                     </div>
                 </div>
                 <div class="panel-body">
-                    <form role="form">
+                    <form action="charge" method="post" role="form" id="donationform">
                     <div class="form-group">
                         <label for="cardNumber">
                             CARD NUMBER</label>
@@ -48,11 +48,36 @@
                             </div>
                         </div>
                     </div>
+                        <div class="form-group">
+                        <label for="donationamount">
+                            Donation Amount</label>
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="donationamount" placeholder="Donation Amount"
+                                required autofocus />
+                            <input type="radio"  name="donationamount" value="25"
+                            onclick="calculateTotal()" />
+                            $25<br>
+                            <input type="radio"  name="donationamount" value="50"
+                            onclick="calculateTotal()" />
+                            $50<br>
+                            <input type="radio"  name="donationamount" value="100"
+                            onclick="calculateTotal()" />
+                            $100<br>
+                            <fieldset>
+                            <legend>Make your cake!</legend>
+                            <label >Size Of the Cake</label>
+                            <label class='radiolabel'><input type="radio"  name="selectedcake" value="Round6" onclick="calculateTotal()" />Round cake 6" -  serves 8 people ($20)</label><br/>
+                            <label class='radiolabel'><input type="radio"  name="selectedcake" value="Round8" onclick="calculateTotal()" />Round cake 8" - serves 12 people ($25)</label><br/>
+                            <label class='radiolabel'><input type="radio"  name="selectedcake" value="Round10" onclick="calculateTotal()" />Round cake 10" - serves 16 people($35)</label><br/>
+                            <label class='radiolabel'><input type="radio"  name="selectedcake" value="Round12" onclick="calculateTotal()" />Round cake 12" - serves 30 people($75)</label><br/>
+                            </fieldset>
+                        </div>
+                    </div>
                     </form>
                 </div>
             </div>
             <ul class="nav nav-pills nav-stacked">
-                <li class="active"><a href="#"><span class="badge pull-right"><span class="glyphicon glyphicon-usd"></span>4200</span> Final Payment</a>
+                <li class="active"><a href="#"><span class="badge pull-right"><span class="glyphicon glyphicon-usd"></span><div id="totalPrice"></div></span> After Square Fees:</a>
                 </li>
             </ul>
             <br/>
@@ -62,10 +87,23 @@
 </div>
 
 
-
-
-
-
+<form action="charge" method="post">
+                <article>
+                <p><h1>BAGIS FORMU</h1></p>
+                Isim:<br>
+                <input type="text" name="memberName"><br><p>
+                Email:<br>
+                <input type="text" name="notificationEmail"><br><p>
+                Telefon:<br>
+                <input type="text" name="phoneNumber"><br><p>
+                Miktar:<br>
+                <input type="radio" name="donationAmount" value="25"> $25.00 <br>
+                <input type="radio" name="donationAmount" value="50"> $50.00 <br>
+                <input type="radio" name="donationAmount" value="100">$100.00 <br>
+                <input type="text" name="donationAmount">
+                </article>
+                <input type="submit" value="Bagis Yap">
+            </form>
 
 
 

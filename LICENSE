@@ -19,29 +19,3 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-
-
-
-<table border="1px">
-    <tr>
-        <td>
-            <form action="charge" method="post">
-                <article>
-                <p><h1>BAGIS FORMU</h1></p>
-                Isim:<br>
-                <input type="text" name="memberName"><br><p>
-                Email:<br>
-                <input type="text" name="notificationEmail"><br><p>
-                Telefon:<br>
-                <input type="text" name="phoneNumber"><br><p>
-                Miktar:<br>
-                <input type="radio" name="donationAmount" value="25"> $25.00 <br>
-                <input type="radio" name="donationAmount" value="50"> $50.00 <br>
-                <input type="radio" name="donationAmount" value="100">$100.00 <br>
-                <input type="text" name="donationAmount">
-                </article>
-                <input type="submit" value="Bagis Yap">
-            </form>
-        </td>
-    </tr>
-</table>

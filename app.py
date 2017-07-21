@@ -1,6 +1,6 @@
 from __future__ import print_function
 from flask import Flask, render_template
-from forms import signupform
+from forms import signupform, donationform
 import squareconnect
 from squareconnect.rest import ApiException
 from squareconnect.apis.customers_api import CustomersApi
@@ -31,7 +31,7 @@ def signup():
 
 @app.route('/charge', methods=['POST'])
 def charge():
-    form = signupform()
+    form = donationform()
     try:
         api_response = api_instance.create_customer(CreateCustomerRequest(
             given_name=form.memberName.data,
