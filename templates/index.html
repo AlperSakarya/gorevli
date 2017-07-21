@@ -1,44 +1,21 @@
 {% extends "layout.html" %}
 {% block content %}
 
-<table border="1px">
-    <tr>
-        <td>
-            <form action="charge" method="post">
-                <article>
-                <p><h1>BAGIS FORMU</h1></p>
-                Isim:<br>
-                <input type="text" name="memberName"><br><p>
-                Email:<br>
-                <input type="text" name="notificationEmail"><br><p>
-                Telefon:<br>
-                <input type="text" name="phoneNumber"><br><p>
-                Miktar:<br>
-                <input type="radio" name="donationAmount" value="25"> $25.00 <br>
-                <input type="radio" name="donationAmount" value="50"> $50.00 <br>
-                <input type="radio" name="donationAmount" value="100">$100.00 <br>
-                <input type="text" name="donationAmount">
-                </article>
-                <input type="submit" value="Bagis Yap">
-            </form>
-        </td>
+    <div class="container">
+    <div class="row">
+        <div class="col-xs-6 col-md-4">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title" align="center">
+                        <label>Vakif Bilgi Sistemi</label>
+                    </h3>
+                </div>
+                <a href="donate" class="btn btn-success btn-lg btn-block" role="button">Bagis</a>
+                <a href="signup" class="btn btn-success btn-lg btn-block" role="button">Uyelik</a>
 
-        <td>
-            <form action="signup" method="post">
-                <article>
-                <p><h1>UYELIK FORMU</h1></p>
-                Isim:<br>
-                <input type="text" name="memberName"><br><p>
-                Email:<br>
-                <input type="text" name="notificationEmail"><br><p>
-                Telefon:<br>
-                <input type="text" name="phoneNumber"><br><p>
-                </article>
-                <input type="submit" value="Uye Ol">
-            </form>
-        </td>
-    </tr>
-</table>
-
+            </div>
+        </div>
+    </div>
+</div>
 
 {% endblock %}

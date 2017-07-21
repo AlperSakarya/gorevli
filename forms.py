@@ -6,5 +6,10 @@ class signupform(Form):
     memberName = TextField("Name")
     notificationEmail = TextField("Notification Email")
     phoneNumber = TextField("Phone Number")
-    donationAmount = TextField("Donation Amount")
 
+
+class donationform(Form):
+    memberName = TextField("Name")
+    notificationEmail = TextField("Notification Email")
+    phoneNumber = TextField("Phone Number")
+    donationAmount = TextField("Donation Amount")
