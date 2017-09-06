@@ -1,20 +1,20 @@
 {% extends "layout.html" %}
 {% block content %}
 
-
     {% if exception == "" %}
+
         <p><h2>Tesekkurler, sistemimize basariyla uye oldunuz! </h2></p>
         <p><h3>Artik bizden SMS ve Email alabilirsiniz. </h3></p>
             Isim: {{ isim }}<br>
             Telefon: {{ telefon }}<br>
             Email: {{ email }}<br>
 
-
         {%else%}
+
         <p><h2>Kayit isleminde bir HATA olustu, tekrar deneyin.</h2></p>
         <p><h3>Butun kutulari doldurmayi unutmayiniz.</h3></p>
-
         <h3>Detaylar:</h3><br>
+
         {{ exception }}
 
     {%endif%}

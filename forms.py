@@ -13,3 +13,12 @@ class donationform(Form):
     notificationEmail = TextField("Notification Email")
     phoneNumber = TextField("Phone Number")
     donationAmount = TextField("Donation Amount")
+
+
+class LoginForm(Form):
+    adminEmail = TextField("Admin Email")
+    adminPassword = PasswordField("Admin Password")
+
+
+class SmsForm(Form):
+    sms_content = TextField("SMS content")
