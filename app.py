@@ -10,7 +10,7 @@ import time
 import re
 import auth  # I pass my Square access token here and import this auth.py file
 # squareconnect.configuration.access_token = 'put access token here'
-from auth import client, auth_token, account_sid
+from auth import client, auth_token, account_sid, location_id, from_number
 
 api_instance = CustomersApi()
 app = Flask(__name__)
@@ -60,8 +60,7 @@ def charge():
             phone_number=form.phoneNumber.data,
             amount_money=Money(form.donationAmount.data, 'USD'),
             idempotency_key=uuid.uuid4(),
-            location_id="5GKMAHGA9Y9N1"
-
+            location_id=location_id
         ))
         print(api_response.customer.id)
         return render_template('charge.html', exception="", isim=form.memberName.data, amount=form.donationAmount.data,
@@ -104,7 +103,7 @@ def admin_login():
 def send_sms_message():
     # List customers from Square and SMS with twilio
     # Setting from number for members
-    from_number = "+12406182543"
+
     form = SmsForm()
     sms_message = form.sms_content.data
     try:
