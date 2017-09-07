@@ -1,0 +1,26 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<div class="container">
+    <div class="row">
+        <div class="col-xs-12 col-md-4">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">
+                        Vakif Admin Paneli
+                    </h3>
+                </div>
+                <form action="adminlogin" method="post">
+                    <label>Email:</label>
+                    <input type="text" name="adminEmail" class="form-control" placeholder="Valid Email Address"
+                                    required autofocus/><br><p>
+                    <label>Sifre:</label>
+                    <input type="password" name="adminPassword" class="form-control" placeholder="Valid Phone Number"
+                                    required autofocus/><br><p>
+                    <input type="submit" value="Giris Yap" class="btn btn-success btn-lg btn-block" role="button">
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

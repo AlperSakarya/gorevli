@@ -1,0 +1,44 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<div>
+    <form action="send-sms" method="post">
+        {% if success_message %}
+            <div class="alert alert-success" role="alert"><span class="label label-success">Success</span> {{ success_message }}</div><p>
+        {% endif %}
+        {% if e %}
+        <span class="label label-danger">Success</span><br>
+        <div class="alert alert-danger" role="alert">{{ e }}</div><p>
+        {% endif %}
+        <label>SMS Message:</label>
+        <input type="text" name="sms_content" class="form-control" placeholder="Enter SMS message here!"
+                        required autofocus/><br><p>
+        <input type="submit" value="SEND SMS" class="btn btn-success btn-lg btn-block" role="button">
+    </form>
+</div>
+
+Current Members:
+    <ul>
+{% for i in api_response.customers %}
+
+{% if i.phone_number != None %}
+    <li>
+    <table border="1px">
+        <tr>
+            <td>Name:{{ i.given_name }} {{ i.family_name }}</td>
+        </tr>
+        <tr>
+            <td> Phone number: {{ i.phone_number }}</td>
+        </tr>
+        <tr>
+            <td>Email Address: {{i.email_address}}</td>
+        </tr>
+    </table>
+    </li>
+    {% else %}
+{% endif %}
+
+{% endfor %}
+    </ul>
+
+{% endblock %}
