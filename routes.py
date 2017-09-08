@@ -54,6 +54,7 @@ def get_customers():
 @app.route('/charge', methods=['POST'])
 def charge_card():
     card_nonce=request.form['nonce']
+    donation=int(request.form['donation-amount']) * 100
     response = unirest.post('https://connect.squareup.com/v2/locations/' + location_id + '/transactions',
   headers={
     'Accept': 'application/json',
@@ -63,7 +64,7 @@ def charge_card():
   params = json.dumps({
     'card_nonce': card_nonce,
     'amount_money': {
-      'amount': 100,
+      'amount': donation,
       'currency': 'USD'
     },
     'idempotency_key': str(uuid.uuid1())
