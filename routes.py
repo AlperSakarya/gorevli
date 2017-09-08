@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 from __future__ import print_function
-from flask import Flask, render_template
+from flask import Flask, render_template, url_for
 from forms import signupform, donationform, LoginForm, SmsForm
 from squareconnect.rest import ApiException
 from squareconnect.apis.customers_api import CustomersApi
