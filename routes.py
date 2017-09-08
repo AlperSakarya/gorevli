@@ -114,7 +114,7 @@ def send_sms_message():
             if type(i.phone_number) == str:
                 member_number = re.sub("[^0-9]", "", i.phone_number)
                 message = client.api.account.messages.create(to=member_number, from_=from_number, body=sms_message)
-                time.sleep(1)
+                time.sleep(3)
                 return render_template('gorevli-paneli.html', api_response=api_response,
                                        success_message="SMS was sent to all members!")
     except ApiException as e:
