@@ -6,12 +6,12 @@ from squareconnect.rest import ApiException
 from squareconnect.apis.customers_api import CustomersApi
 from squareconnect.models.create_customer_request import CreateCustomerRequest
 from squareconnect import Money
-import uuid
+import uuid, json, unirest, sys
 import time
 import re
 import auth  # I pass my Square access token here and import this auth.py file
 # squareconnect.configuration.access_token = 'put access token here'
-from auth import client, auth_token, account_sid, location_id, from_number
+from auth import client, auth_token, account_sid, location_id, from_number, access_token
 
 api_instance = CustomersApi()
 app = Flask(__name__)
@@ -52,24 +52,24 @@ def get_customers():
 
 
 @app.route('/charge', methods=['POST'])
-def charge():
-    form = donationform()
-    try:
-        api_response = api_instance.create_customer(CreateCustomerRequest(
-            given_name=form.memberName.data,
-            email_address=form.notificationEmail.data,
-            phone_number=form.phoneNumber.data,
-            amount_money=Money(form.donationAmount.data, 'USD'),
-            idempotency_key=uuid.uuid4(),
-            location_id=location_id
-        ))
-        print(api_response.customer.id)
-        return render_template('charge.html', exception="", isim=form.memberName.data, amount=form.donationAmount.data,
-                               email=form.notificationEmail.data, telefon=form.phoneNumber.data)
-
-    except ApiException as e:
-        print(e.body)
-        return render_template('charge.html', exception=e.body)
+def charge_card():
+    card_nonce=request.form['card-nonce']
+    response = unirest.post('https://connect.squareup.com/v2/locations/' + location_id + '/transactions', headers={
+    'Accept': 'application/json',
+    'Content-Type': 'application/json',
+    'Authorization': 'Bearer ' + access_token,
+  },
+  params = json.dumps({
+    'card_nonce': card_nonce,
+    'amount_money': {
+      'amount': 1,
+      'currency': 'USD'
+    },
+    'idempotency_key': str(uuid.uuid1())
+  })
+)
+    
+    return render_template('donate-response.html',result=response.body)
 
 
 @app.route('/signuprequest', methods=['POST'])
