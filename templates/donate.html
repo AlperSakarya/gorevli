@@ -4,19 +4,20 @@
   <head>
     <meta charset="UTF-8">
     <meta http-equiv="x-ua-compatible" content="ie=edge">
-    <title>Sample Payment Form</title>
+    <title>Vakif Bagis Formu</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <script type="text/javascript" src="https://js.squareup.com/v2/paymentform">
     </script>
+    <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="https://v4-alpha.getbootstrap.com/examples/signin/signin.css">
+    <link rel="stylesheet" type="text/css" href="https://getbootstrap.com/docs/4.0/examples/narrow-jumbotron/narrow-jumbotron.css">
+    <script src="//code.jquery.com/jquery-1.9.1.js"></script>
+    <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
     <script>
 
     var applicationId = 'sq0idp-W2uCBajFuXqD7AxS2NOqLw'; // <-- Add your application's ID here
-
-    // You can delete this 'if' statement. It's here to notify you that you need
-    // to provide your application ID.
-    if (applicationId == '') {
-      alert('You need to provide a value for the applicationId variable.');
-    }
 
     // Initializes the payment form. See the documentation for descriptions of
     // each of these parameters.
@@ -148,24 +149,28 @@
         /* Indicates how form inputs should appear when they contain invalid values */
         outline: 5px auto rgb(255, 97, 97);
       }
-    </style>
+  </style>
   </head>
 
-  <body>
+ <body>
+  <div class="container">
 
     <!--
       These div elements are the placeholder elements that are replaced by the
       SqPaymentForm's iframes.
     -->
-    <label>Card Number</label>
-    <div id="sq-card-number"></div>
-    <label>CVV</label>
-    <div id="sq-cvv"></div>
-    <label>Expiration Date</label>
-    <div id="sq-expiration-date"></div>
-    <label>Postal Code</label>
-    <div id="sq-postal-code"></div>
+<div class="form-signin">
+    <h2 class="form-signin-heading">Bagis Kart Bilgileri</h2>
 
+    <label>Card Number:</label>
+    <div id="sq-card-number" autofocus required></div>
+    <label>CVV:</label>
+    <div id="sq-cvv" autofocus required></div>
+    <label>Expiration Date:</label>
+    <div id="sq-expiration-date" autofocus required></div>
+    <label>Postal Code:</label>
+    <div id="sq-postal-code" autofocus required></div>
+</div>
     <!--
       After the SqPaymentForm generates a card nonce, *this* form POSTs the generated
       card nonce to your application's server.
@@ -181,15 +186,17 @@
       -->
       <input type="hidden" id="card-nonce" name="nonce">
       <label>Donation Amount:</label><br>
-      <input type="text" name="donation-amount">
-
+      <input class="form-control" type="text" name="donation-amount"><br>
 
       <!--
         Clicking this Submit button kicks off the process to generate a card nonce
         from the buyer's card information.
       -->
       <input type="submit" onclick="requestCardNonce(event)">
-    </form>
-  </body>
+    </form>     
+
+
+</div>
+</body>
 </html>
 {% endblock %}
