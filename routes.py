@@ -1,12 +1,12 @@
 #!/usr/bin/env python
 from __future__ import print_function
-from flask import Flask, render_template, url_for
+from flask import Flask, render_template, url_for, request
 from forms import signupform, donationform, LoginForm, SmsForm
 from squareconnect.rest import ApiException
 from squareconnect.apis.customers_api import CustomersApi
 from squareconnect.models.create_customer_request import CreateCustomerRequest
 from squareconnect import Money
-import uuid, json, unirest, sys
+import uuid, json, unirest
 import time
 import re
 import auth  # I pass my Square access token here and import this auth.py file
@@ -53,23 +53,12 @@ def get_customers():
 
 @app.route('/charge', methods=['POST'])
 def charge_card():
-    card_nonce=request.form['card-nonce']
-    response = unirest.post('https://connect.squareup.com/v2/locations/' + location_id + '/transactions', headers={
-    'Accept': 'application/json',
-    'Content-Type': 'application/json',
-    'Authorization': 'Bearer ' + access_token,
-  },
-  params = json.dumps({
-    'card_nonce': card_nonce,
-    'amount_money': {
-      'amount': 1,
-      'currency': 'USD'
-    },
-    'idempotency_key': str(uuid.uuid1())
-  })
-)
-    
-    return render_template('donate-response.html',result=response.body)
+    card_nonce=request.form['nonce']
+    print(card_nonce)
+    print(access_token)
+    print(location_id)
+	
+    #return render_template('donate-response.html',result="osman")
 
 
 @app.route('/signuprequest', methods=['POST'])
