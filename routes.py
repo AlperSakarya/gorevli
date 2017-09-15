@@ -61,7 +61,7 @@ def charge_card():
     'Content-Type': 'application/json',
     'Authorization': 'Bearer ' + access_token,
   },
-  params = json.dumps({
+  params=json.dumps({
     'card_nonce': card_nonce,
     'amount_money': {
       'amount': donation,
@@ -93,9 +93,21 @@ def signuprequest():
 @app.route('/adminlogin', methods=['POST'])
 def admin_login():
     form = LoginForm()
+    registered_members = 0
+
     if form.adminEmail.data == auth.admin_Email and form.adminPassword.data == auth.admin_Password:
-        api_response = api_instance.list_customers()
-        return render_template('gorevli-paneli.html', api_response=api_response)
+        try:
+            api_response = api_instance.list_customers()
+            for i in api_response.customers:
+                if type(i.phone_number) == str:
+                    member_number = re.sub("[^0-9]", "", i.phone_number)
+                    registered_members += 1
+            print (registered_members)
+            return render_template('gorevli-paneli.html', api_response=api_response,
+                                   registered_members=registered_members)
+
+        except ApiException as e:
+            return render_template('donate-response.html', exception="Hata olustu")
 
     else:
         return render_template('donate-response.html', exception="Yanlis Bilgi Girildi")
@@ -107,6 +119,7 @@ def send_sms_message():
     # Setting from number for members
     form = SmsForm()
     sms_message = form.sms_content.data
+    registered_members = 0
 
     try:
         api_response = api_instance.list_customers()
@@ -114,12 +127,13 @@ def send_sms_message():
             if type(i.phone_number) == str:
                 member_number = re.sub("[^0-9]", "", i.phone_number)
                 message = client.api.account.messages.create(to=member_number, from_=from_number, body=sms_message)
+                registered_members += 1
 
     except ApiException as e:
         return render_template('gorevli-paneli.html', api_response=api_response, exception=e)
 
     return render_template('gorevli-paneli.html', api_response=api_response,
-                           success_message="SMS was sent to all members!")
+                           success_message="SMS was sent to all members!", registered_members=registered_members)
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0')

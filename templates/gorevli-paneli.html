@@ -10,37 +10,38 @@
         <span class="label label-danger">Success</span><br>
         <div class="alert alert-danger" role="alert">{{ e }}</div><p>
         {% endif %}
-<h2 class="form-signin-heading">SMS Message:</h2>
+        <h2 class="form-signin-heading">SMS Message:</h2>
         <input type="text" name="sms_content" class="form-control" placeholder="Enter SMS message here!"
                         required autofocus/><br><p>
         <input type="submit" value="SEND SMS" class="btn btn-success btn-lg btn-block" role="button">
     </form>
 
-
-
 <p><h2 class="form-signin-heading">Current Members</h2></p>
 
-<ul>
-    <li>
+Total Registered Members: {{ registered_members }}<p>
+<div>
     <table border="1px">
-{% for i in api_response.customers %}
-  {% if i.phone_number != None %}
         <tr>
-            <td>Name:{{ i.given_name }} {{ i.family_name }}</td>
+            <th>NAME</th>
+            <th>PHONE</th>
+            <th>EMAIL</th>
         </tr>
-        <tr>
-            <td> Phone number: {{ i.phone_number }}</td>
-        </tr>
-        <tr style="border-bottom:3px solid black">
-            <td>Email Address: {{i.email_address}}</td>
-        </tr>
-    {% else %}
-  {% endif %}
-{% endfor %}
-
+        {% for i in api_response.customers %}
+            {% if i.phone_number != None %}
+                <tr>
+                    <td style="border-bottom:3px solid black"> {{ i.given_name }} {{ i.family_name }} </td>
+                    <td style="border-bottom:3px solid black"> {{ i.phone_number }} </td>
+                    <td style="border-bottom:3px solid black"> {{i.email_address}} </td>
+                </tr>
+            {% else %}
+          {% endif %}
+        {% endfor %}
     </table>
-    </li>
-    </ul>
+</div>
+<br>
+<div>
+    <a href="/" class="btn btn-success btn-lg btn-block">GERI</a>
+</div>
 
 </div>
 
