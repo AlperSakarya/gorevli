@@ -105,20 +105,23 @@ def admin_login():
 def send_sms_message():
     # List customers from Square and SMS with twilio
     # Setting from number for members
-
     form = SmsForm()
     sms_message = form.sms_content.data
+
     try:
         api_response = api_instance.list_customers()
         for i in api_response.customers:
             if type(i.phone_number) == str:
                 member_number = re.sub("[^0-9]", "", i.phone_number)
+#                print (i.phone_number)
                 message = client.api.account.messages.create(to=member_number, from_=from_number, body=sms_message)
-                time.sleep(3)
-                return render_template('gorevli-paneli.html', api_response=api_response,
-                                       success_message="SMS was sent to all members!")
+                time.sleep(1)
+
     except ApiException as e:
         return render_template('gorevli-paneli.html', api_response=api_response, exception=e)
+
+    return render_template('gorevli-paneli.html', api_response=api_response,
+                           success_message="SMS was sent to all members!")
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0')
