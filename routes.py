@@ -6,7 +6,7 @@ from squareconnect.rest import ApiException
 from squareconnect.apis.customers_api import CustomersApi
 from squareconnect.models.create_customer_request import CreateCustomerRequest
 from squareconnect import Money
-import uuid, json, unirest, re, os, sqlite3, time
+import uuid, json, unirest, re, time
 import auth  # I pass my Square access token here and import this auth.py file
 # squareconnect.configuration.access_token = 'put access token here'
 from auth import client, auth_token, account_sid, location_id, from_number, access_token
@@ -15,16 +15,6 @@ api_instance = CustomersApi()
 app = Flask(__name__)
 app.secret_key = 'myverylongsecretkey'
 
-
-def check_create_db():
-    data_path = './database/'
-    filename = 'member-db'
-    if os.path.isdir("./database") != True:
-        os.makedirs(data_path)
-    db = sqlite3.connect(data_path + filename + '.sqlite3')
-    db.execute('CREATE TABLE IF NOT EXISTS members (id INTEGER PRIMARY KEY, name VARCHAR, phone INT, email VARCHAR)')
-    db.close()
-check_create_db()
 
 @app.route('/')
 def index():
