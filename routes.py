@@ -79,7 +79,6 @@ def signuprequest():
 def admin_login():
     form = LoginForm()
     registered_members = 0
-    print("osman")
     if form.adminEmail.data == auth.admin_Email and form.adminPassword.data == auth.admin_Password:
         try:
             api_response = api_instance.list_customers()
@@ -90,10 +89,10 @@ def admin_login():
                 return render_template('gorevli-paneli.html', api_response=api_response, registered_members=registered_members)
 
         except ApiException as e:
-            return render_template('donate-response.html', exception="Hata olustu")
+            return render_template('donate-response.html', exception_message="Hata olustu", e=e)
 
     else:
-        return render_template('donate-response.html', exception="Yanlis Bilgi Girildi")
+        return render_template('donate-response.html', exception_message="Yanlis Bilgi Girildi")
 
 
 @app.route('/send-sms', methods=['POST'])
