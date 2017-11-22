@@ -55,7 +55,7 @@ def charge_card():
     'idempotency_key': str(uuid.uuid1())
   })
 )	
-    return render_template('donate-response.html',result=response.body)
+    return render_template('donate-response.html', result=response.body)
 
 
 @app.route('/signuprequest', methods=['POST'])
@@ -79,7 +79,7 @@ def signuprequest():
 def admin_login():
     form = LoginForm()
     registered_members = 0
-
+    print("osman")
     if form.adminEmail.data == auth.admin_Email and form.adminPassword.data == auth.admin_Password:
         try:
             api_response = api_instance.list_customers()
@@ -87,9 +87,7 @@ def admin_login():
                 if type(i.phone_number) == str:
                     member_number = re.sub("[^0-9]", "", i.phone_number)
                     registered_members += 1
-            print (registered_members)
-            return render_template('gorevli-paneli.html', api_response=api_response,
-                                   registered_members=registered_members)
+                return render_template('gorevli-paneli.html', api_response=api_response, registered_members=registered_members)
 
         except ApiException as e:
             return render_template('donate-response.html', exception="Hata olustu")
