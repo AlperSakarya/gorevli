@@ -62,12 +62,19 @@ def charge_card():
 def signuprequest():
     form = signupform()
     try:
-        api_response = api_instance.create_customer(CreateCustomerRequest(
-            given_name=form.memberName.data,
-            email_address=form.notificationEmail.data,
-            phone_number=form.phoneNumber.data
+        if form.notificationEmail.data != "":
+            api_response = api_instance.create_customer(CreateCustomerRequest(
+                given_name=form.memberName.data,
+                email_address=form.notificationEmail.data,
+                phone_number=form.phoneNumber.data
 
-        ))
+            ))
+        else:
+            api_response = api_instance.create_customer(CreateCustomerRequest(
+                given_name=form.memberName.data,
+                phone_number=form.phoneNumber.data
+            ))
+
         return render_template('signup-response.html', exception="", isim=form.memberName.data,
                                email=form.notificationEmail.data, telefon=form.phoneNumber.data)
 
