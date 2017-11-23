@@ -1,19 +1,167 @@
-{% extends "layout.html" %}
-{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta http-equiv="Content-type" content="text/html; charset=utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="description" content="">
+        <meta name="author" content="">
+        <title>Semerkand Washington D.C Vakfi Uyelik ve Bagis Formu</title>
+        <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+        <link rel="stylesheet" type="text/css" href="https://v4-alpha.getbootstrap.com/examples/signin/signin.css">
+        <link rel="stylesheet" type="text/css" href="https://getbootstrap.com/docs/4.0/examples/narrow-jumbotron/narrow-jumbotron.css">
+        <script src="//code.jquery.com/jquery-1.9.1.js"></script>
+        <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+        <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+        <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
+        <script type="text/javascript" src="https://ajax.aspnetcdn.com/ajax/jquery.validate/1.8.1/jquery.validate.min.js"></script>
+        <script type="text/javascript" src="https://js.stripe.com/v1/"></script>
+        <!--[if lt IE 9]>
+          <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+          <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+        <![endif]-->
+
+        <script type="text/javascript">
+          Stripe.setPublishableKey('pk_test_jacAt6gw0WCMI6Em4xHSA70i');
+            $(document).ready(function() {
+                function addInputNames() {
+                    // Not ideal, but jQuery's validate plugin requires fields to have names
+                    // so we add them at the last possible minute, in case any javascript 
+                    // exceptions have caused other parts of the script to fail.
+                    $(".card-number").attr("name", "card-number")
+                    $(".card-cvc").attr("name", "card-cvc")
+                    $(".card-expiry-year").attr("name", "card-expiry-year")
+                }
+
+                function removeInputNames() {
+                    $(".card-number").removeAttr("name")
+                    $(".card-cvc").removeAttr("name")
+                    $(".card-expiry-year").removeAttr("name")
+                }
+
+                function submit(form) {
+                    // remove the input field names for security
+                    // we do this *before* anything else which might throw an exception
+                    removeInputNames(); // THIS IS IMPORTANT!
+
+                    // given a valid form, submit the payment details to stripe
+                    $(form['submit-button']).attr("disabled", "disabled")
+
+                    Stripe.createToken({
+                        number: $('.card-number').val(),
+                        cvc: $('.card-cvc').val(),
+                        exp_month: $('.card-expiry-month').val(), 
+                        exp_year: $('.card-expiry-year').val()
+                    }, function(status, response) {
+                        if (response.error) {
+                            // re-enable the submit button
+                            $(form['submit-button']).removeAttr("disabled")
+        
+                            // show the error
+                            $(".payment-errors").html(response.error.message);
+
+                            // we add these names back in so we can revalidate properly
+                            addInputNames();
+                        } else {
+                            // token contains id, last4, and card type
+                            var token = response['id'];
+
+                            // insert the stripe token
+                            var input = $("<input name='stripeToken' value='" + token + "' style='display:none;' />");
+                            form.appendChild(input[0])
+
+                            // and submit
+                            form.submit();
+                        }
+                    });
+                    
+                    return false;
+                }
+                
+                // add custom rules for credit card validating
+                jQuery.validator.addMethod("cardNumber", Stripe.validateCardNumber, "Please enter a valid card number");
+                jQuery.validator.addMethod("cardCVC", Stripe.validateCVC, "Please enter a valid security code");
+                jQuery.validator.addMethod("cardExpiry", function() {
+                    return Stripe.validateExpiry($(".card-expiry-month").val(), 
+                                                 $(".card-expiry-year").val())
+                }, "Please enter a valid expiration");
+
+                // We use the jQuery validate plugin to validate required params on submit
+                $("#example-form").validate({
+                    submitHandler: submit,
+                    rules: {
+                        "card-cvc" : {
+                            cardCVC: true,
+                            required: true
+                        },
+                        "card-number" : {
+                            cardNumber: true,
+                            required: true
+                        },
+                        "card-expiry-year" : "cardExpiry" // we don't validate month separately
+                    }
+                });
+
+                // adding the input field names is the last step, in case an earlier step errors                
+                addInputNames();
+            });
+        </script>
+    </head>
+
+    <body>
 
     <div class="container">
-        <form action="/charge" method="post">
-            <article>
-            <label>
-                <span>Amount is $5.00</span>
-            </label>
-            </article>
-            <script src="https://checkout.stripe.com/checkout.js" class="stripe-button"
-                    data-key="{{ key }}"
-                    data-description="Semerkand Cultural Association - Donation"
-                    data-amount="500"
-                    data-locale="auto">
-            </script>
+        <h2 align="center" class="form-signin-heading">Vakif Bagis Formu</h2>
+    
+        <form class="form-signin" action="/charge" method="post" id="example-form" style="display: none;">
+
+            <p><label for="email" class="sr-only">Email:</label>
+                <input type="text" name="email" class="form-control"  placeholder="Enter Email Address" required autofocus/></p>
+
+            <p><label class="sr-only">Card Number:</label>
+                <input type="text" maxlength="16" class="form-control card-number stripe-sensitive" placeholder="Credit Card Number" required autofocus/></p>
+
+            <p><label class="sr-only">CVC:</label>
+                <input type="text" maxlength="4" class="form-control card-cvc stripe-sensitive" placeholder="CVC Security Number" required autofocus/></p>
+            
+            <div align="center" class="dropdown">
+                <label>Expiration</label>
+                <div class="expiry-wrapper">
+                    <select class="btn btn-secondary btn-lg dropdown-toggle card-expiry-month stripe-sensitive required">
+                    </select>
+                    <script type="text/javascript">
+                        var select = $(".card-expiry-month"),
+                            month = new Date().getMonth() + 1;
+                        for (var i = 1; i <= 12; i++) {
+                            select.append($("<option value='"+i+"' "+(month === i ? "selected" : "")+">"+i+"</option>"))
+                        }
+                    </script>
+                    <span> / </span>
+                    <select class="btn btn-secondary btn-lg dropdown-toggle card-expiry-year stripe-sensitive required"></select>
+                    <script type="text/javascript">
+                        var select = $(".card-expiry-year"),
+                            year = new Date().getFullYear();
+
+                        for (var i = 0; i < 12; i++) {
+                            select.append($("<option value='"+(i + year)+"' "+(i === 0 ? "selected" : "")+">"+(i + year)+"</option>"))
+                        }
+                    </script>
+                </div>
+            </div>
+            <p>
+            <br><input type="submit" name="submit-button" value="Submit" class="btn btn-success btn-lg btn-block" role="button">
         </form>
+
+        <!-- 
+            The easiest way to indicate that the form requires JavaScript is to show
+            the form with JavaScript (otherwise it will not render). You can add a
+            helpful message in a noscript to indicate that users should enable JS.
+        -->
+        <script>if (window.Stripe) $("#example-form").show()</script>
+        <noscript><p>JavaScript is required for the registration form.</p></noscript>
+
     </div>
-{% endblock %}
+    </body>
+
+</html>

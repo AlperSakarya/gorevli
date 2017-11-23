@@ -5,7 +5,6 @@ from forms import signupform, donationform, LoginForm, SmsForm
 from squareconnect.rest import ApiException
 from squareconnect.apis.customers_api import CustomersApi
 from squareconnect.models.create_customer_request import CreateCustomerRequest
-#from squareconnect import Money
 import uuid, json, unirest, re, time
 import auth  # I pass my Square access token here and import this auth.py file
 import stripe
@@ -17,6 +16,7 @@ app = Flask(__name__)
 app.secret_key = 'myverylongsecretkey'
 stripe_keys = {'secret_key': STRIPE_SECRET_KEY, 'publishable_key': STRIPE_PUBLISHABLE_KEY}
 stripe.api_key = stripe_keys['secret_key']
+
 
 @app.route('/')
 def index():
@@ -65,7 +65,6 @@ def signuprequest():
 @app.route('/adminlogin', methods=['POST'])
 def admin_login():
     form = LoginForm()
-    registered_members = 0
     if form.adminEmail.data == auth.admin_Email and form.adminPassword.data == auth.admin_Password:
         try:
             api_response = api_instance.list_customers()
@@ -109,7 +108,7 @@ def charge():
 
     try:
         customer = stripe.Customer.create(
-            email='customer@example.com',
+            email=request.form['email'],
             source=request.form['stripeToken']
         )
 
@@ -117,7 +116,7 @@ def charge():
             customer=customer.id,
             amount=amount,
             currency='usd',
-            description='Flask Charge'
+            description='Vakif Bagis'
         )
     except ApiException as e:
         return render_template('donate-response.html', exception_message="Hata olustu", e=e)
