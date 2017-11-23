@@ -4,10 +4,10 @@
     <div class="container">
 
         {% if exception_message %}
-            <h1 class="display-3">{{ exception_message }}</h1>
-            <h3>Bu detaylarin ekran goruntusunu cekip gorevliye bildiriniz:</h3><br>
-                {{ e }} <br>
-            <p><a class="btn btn-lg btn-success" href="/" role="button">Geri Don</a></p>
+            <h1 class="display-3" align="center">{{ exception_message }}</h1>
+            <h3>Bu detaylarin ekran goruntusunu cekip gorevliye bildiriniz:</h3>
+                <p class="text-danger"> {{ e }} </p>
+           <a class="btn btn-lg btn-success" href="/" role="button">Geri Don</a>
 
         {% else %}
             <h1 class="display-3" align="center">Tesekkurler!</h1>

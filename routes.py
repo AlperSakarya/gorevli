@@ -103,26 +103,61 @@ def send_sms_message():
 
 @app.route('/charge', methods=['POST'])
 def charge():
-    # Amount in cents
-    amount = 500
+    amount = int(request.form['amount']) * 100  # Converting to cents to dollars
+    if str(request.form['recurring']) == "no":  # Checking if user wants to subscribe to monthly donations
 
-    try:
-        customer = stripe.Customer.create(
-            email=request.form['email'],
-            source=request.form['stripeToken']
-        )
+        try:
+            customer = stripe.Customer.create(
+                email=request.form['email'],
+                source=request.form['stripeToken']
+            )
 
-        charge = stripe.Charge.create(
-            customer=customer.id,
-            amount=amount,
-            currency='usd',
-            description='Vakif Bagis'
-        )
-    except ApiException as e:
-        return render_template('donate-response.html', exception_message="Hata olustu", e=e)
+            charge = stripe.Charge.create(
+                customer=customer.id,
+                amount=amount,
+                currency='usd',
+                description='Vakif Bagis'
+            )
 
-    return render_template('donate-response.html', amount=amount)
+        except ApiException as e:
+            return render_template('donate-response.html', exception_message="Hata olustu", e=e)
 
+        return render_template('donate-response.html', amount=amount)
+    else:
+        try:
+            try:
+                plan_id = request.form['email']
+                plan = stripe.Plan.create(
+                    name="Monthly Donation",
+                    id=request.form['email'],
+                    interval="month",
+                    currency="usd",
+                    amount=amount
+                )
+            except stripe.InvalidRequestError as e:
+                return render_template('donate-response.html', exception_message="Hata olustu", e=e)
+
+            try:
+                customer = stripe.Customer.create(
+                    email=request.form['email'],
+                    source=request.form['stripeToken']
+                )
+            except stripe.InvalidRequestError as e:
+                return render_template('donate-response.html', exception_message="Hata olustu", e=e)
+
+            try:
+                subscribe = stripe.Plan.create(
+                    customer=customer.id,
+                    items=[{
+                        "plan": plan_id}]
+                )
+            except stripe.InvalidRequestError as e:
+                return render_template('donate-response.html', exception_message="Hata olustu", e=e)
+
+        except ApiException as e:
+            return render_template('donate-response.html', exception_message="Hata olustu", e=e)
+
+        return render_template('donate-response.html', amount=amount)
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0')
