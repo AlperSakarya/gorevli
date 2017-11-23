@@ -1,0 +1,25 @@
+{% extends "layout.html" %}
+{% block content %}
+
+    <div class="container">
+
+        {% if exception_message == "" %}
+            <h1 class="display-3" align="center">Tesekkurler!</h1>
+            <p align="center"><a class="btn btn-lg btn-success" href="/" role="button">Geri Don</a></p>
+
+        {% elif e %}
+            <h1 class="display-3" align="center">{{ exception_message }}</h1><br>
+            <h3 align="center">Bu detaylarin ekran goruntusunu cekip gorevliye bildiriniz:</h3><br>
+                {{ e }} <br>
+            <p align="center"><a class="btn btn-lg btn-warning" href="/" role="button">Geri Don</a></p>
+
+        {% else %}
+            <h1 class="display-3" align="center">{{ exception_message }}</h1><br>
+            <p class="lead" align="center">Giris islemini tekrar deneyin.<br> Kullanici adi ve sifreyi dogru giriniz.</p>
+            <p align="center"><a class="btn btn-lg btn-warning" href="/admin" role="button">Geri Don</a></p>
+
+        {% endif %}
+
+    </div>
+
+{% endblock %}
