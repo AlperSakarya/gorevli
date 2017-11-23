@@ -5,7 +5,7 @@ from forms import signupform, donationform, LoginForm, SmsForm
 from squareconnect.rest import ApiException
 from squareconnect.apis.customers_api import CustomersApi
 from squareconnect.models.create_customer_request import CreateCustomerRequest
-import uuid, json, unirest, re, time
+import uuid, json, unirest, re, time, datetime
 import auth  # I pass my Square access token here and import this auth.py file
 import stripe
 from auth import client, auth_token, account_sid, location_id, from_number, access_token, STRIPE_PUBLISHABLE_KEY, STRIPE_SECRET_KEY
@@ -20,7 +20,8 @@ stripe.api_key = stripe_keys['secret_key']
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    now = datetime.datetime.now()
+    return render_template('index.html', year=now.year)
 
 
 @app.route('/donate')
