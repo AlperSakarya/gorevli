@@ -1,29 +1,30 @@
 {% extends "layout.html" %}
 {% block content %}
 
-<div class="container">
+    <div class="container">
 
-<div class="jumbotron">
+        <div class="jumbotron">
 
-    {% if exception == "" %}
-        <h1 class="display-3">Tesekkurler!</h1>
-	<p class="lead">Sistemimize basariyla uye oldunuz! Artik bizden SMS ve Email alabilirsiniz.</p>
-            Isim: {{ isim }}<br>
-            Telefon: {{ telefon }}<br>
-            Email: {{ email }}<br><p>
-	<p><a class="btn btn-lg btn-success" href="/" role="button">Geri Don / Yeni Uye</a></p>
-        
-	{%else%}
+            {% if exception == "" %}
+                <h1 class="display-3">Tesekkurler!</h1>
+                <p class="lead">Sistemimize basariyla uye oldunuz! Artik bizden SMS ve Email alabilirsiniz.</p>
+                    Isim: {{ isim }}<br>
+                    Telefon: {{ telefon }}<br>
+                    Email: {{ email }}<br><p>
+                <p><a class="btn btn-lg btn-success" href="/" role="button">Geri Don / Yeni Uye</a></p>
 
-        <h1 class="display-3">Hata Olustu!</h1>
-	<p class="lead">Kayit islemini tekrar deneyin. Butun kutulari doldurmayi unutmayiniz.</p>
-	<p><a class="btn btn-lg btn-success" href="/signup" role="button">Geri Don / Yeni Uye</a></p>
-        
-	<h3>Bu detaylarin ekran goruntusunu cekip gorevliye bildiriniz:</h3><br>
-        {{ exception }}
+            {%else%}
 
-    {%endif%}
-</div>
-</div>
+                <h1 class="display-3">Hata Olustu!</h1>
+                <p class="lead">Kayit islemini tekrar deneyin. Butun kutulari doldurmayi unutmayiniz.</p>
+                <p><a class="btn btn-lg btn-success" href="/signup" role="button">Geri Don / Yeni Uye</a></p>
+                <h3>Bu detaylarin ekran goruntusunu cekip gorevliye bildiriniz:</h3><br>
+                {{ exception }}
+
+            {%endif%}
+
+        </div>
+
+    </div>
 
 {% endblock %}

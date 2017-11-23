@@ -8,7 +8,6 @@ from squareconnect.models.create_customer_request import CreateCustomerRequest
 from squareconnect import Money
 import uuid, json, unirest, re, time
 import auth  # I pass my Square access token here and import this auth.py file
-# squareconnect.configuration.access_token = 'put access token here'
 from auth import client, auth_token, account_sid, location_id, from_number, access_token
 
 api_instance = CustomersApi()
@@ -89,11 +88,7 @@ def admin_login():
     if form.adminEmail.data == auth.admin_Email and form.adminPassword.data == auth.admin_Password:
         try:
             api_response = api_instance.list_customers()
-            for i in api_response.customers:
-                if type(i.phone_number) == str:
-                    member_number = re.sub("[^0-9]", "", i.phone_number)
-                    registered_members += 1
-                return render_template('gorevli-paneli.html', api_response=api_response, registered_members=registered_members)
+            return render_template('gorevli-paneli.html', api_response=api_response, registered_members=len(api_response.customers))
 
         except ApiException as e:
             return render_template('donate-response.html', exception_message="Hata olustu", e=e)
