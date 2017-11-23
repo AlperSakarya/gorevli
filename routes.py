@@ -5,15 +5,18 @@ from forms import signupform, donationform, LoginForm, SmsForm
 from squareconnect.rest import ApiException
 from squareconnect.apis.customers_api import CustomersApi
 from squareconnect.models.create_customer_request import CreateCustomerRequest
-from squareconnect import Money
+#from squareconnect import Money
 import uuid, json, unirest, re, time
 import auth  # I pass my Square access token here and import this auth.py file
-from auth import client, auth_token, account_sid, location_id, from_number, access_token
+import stripe
+from auth import client, auth_token, account_sid, location_id, from_number, access_token, STRIPE_PUBLISHABLE_KEY, STRIPE_SECRET_KEY
+
 
 api_instance = CustomersApi()
 app = Flask(__name__)
 app.secret_key = 'myverylongsecretkey'
-
+stripe_keys = {'secret_key': STRIPE_SECRET_KEY, 'publishable_key': STRIPE_PUBLISHABLE_KEY}
+stripe.api_key = stripe_keys['secret_key']
 
 @app.route('/')
 def index():
@@ -22,7 +25,7 @@ def index():
 
 @app.route('/donate')
 def donation():
-    return render_template('donate.html')
+    return render_template('donate.html', key=stripe_keys['publishable_key'])
 
 
 @app.route('/signup')
@@ -33,28 +36,6 @@ def signup():
 @app.route('/admin')
 def admin_login_page():
     return render_template('admin.html')
-
-
-@app.route('/charge', methods=['POST'])
-def charge_card():
-    card_nonce=request.form['nonce']
-    donation=int(request.form['donation-amount']) * 100
-    response = unirest.post('https://connect.squareup.com/v2/locations/' + location_id + '/transactions',
-  headers={
-    'Accept': 'application/json',
-    'Content-Type': 'application/json',
-    'Authorization': 'Bearer ' + access_token,
-  },
-  params=json.dumps({
-    'card_nonce': card_nonce,
-    'amount_money': {
-      'amount': donation,
-      'currency': 'USD'
-    },
-    'idempotency_key': str(uuid.uuid1())
-  })
-)	
-    return render_template('donate-response.html', result=response.body)
 
 
 @app.route('/signuprequest', methods=['POST'])
@@ -91,10 +72,10 @@ def admin_login():
             return render_template('gorevli-paneli.html', api_response=api_response, registered_members=len(api_response.customers))
 
         except ApiException as e:
-            return render_template('donate-response.html', exception_message="Hata olustu", e=e)
+            return render_template('login-response.html', exception_message="Hata olustu", e=e)
 
     else:
-        return render_template('donate-response.html', exception_message="Yanlis Bilgi Girildi")
+        return render_template('login-response.html', exception_message="Yanlis Bilgi Girildi")
 
 
 @app.route('/send-sms', methods=['POST'])
@@ -119,6 +100,30 @@ def send_sms_message():
 
     return render_template('gorevli-paneli.html', api_response=api_response,
                            success_message="SMS was sent to all members!", registered_members=registered_members)
+
+
+@app.route('/charge', methods=['POST'])
+def charge():
+    # Amount in cents
+    amount = 500
+
+    try:
+        customer = stripe.Customer.create(
+            email='customer@example.com',
+            source=request.form['stripeToken']
+        )
+
+        charge = stripe.Charge.create(
+            customer=customer.id,
+            amount=amount,
+            currency='usd',
+            description='Flask Charge'
+        )
+    except ApiException as e:
+        return render_template('donate-response.html', exception_message="Hata olustu", e=e)
+
+    return render_template('donate-response.html', amount=amount)
+
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0')
