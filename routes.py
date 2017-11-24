@@ -7,28 +7,23 @@ from squareconnect.rest import ApiException
 from squareconnect.apis.customers_api import CustomersApi
 from squareconnect.models.create_customer_request import CreateCustomerRequest
 import stripe
-import uuid, json, unirest, re, time, datetime, os, sqlite3
+import uuid, json, unirest, re, time, datetime
 import auth  # I pass my Square access token here and import this auth.py file
 from auth import client, auth_token, account_sid, location_id, from_number, access_token,\
     STRIPE_PUBLISHABLE_KEY, STRIPE_SECRET_KEY, users
-from db import check_create_db, create_connection, select_all_members
-
+from db import *
 
 # Setting Global Variables
 api_instance = CustomersApi()
 app = Flask(__name__)
 app = flask.Flask(__name__)
-app.secret_key = 'myverylongsecretkey'
-stripe_keys = {'secret_key': STRIPE_SECRET_KEY, 'publishable_key': STRIPE_PUBLISHABLE_KEY}
-stripe.api_key = stripe_keys['secret_key']
-database = "./database/member-db.sqlite3"
-
-
-# Check and/or create the member database if does not exist. If exist will not overwrite
-check_create_db()
-
-login_manager = flask_login.LoginManager()
-login_manager.init_app(app)
+app.secret_key = 'myverylongsecretkey' #  Change this in your production
+stripe_keys = {'secret_key': STRIPE_SECRET_KEY, 'publishable_key': STRIPE_PUBLISHABLE_KEY}  # Define this in auth.py
+stripe.api_key = stripe_keys['secret_key']  # Define this in auth.py. It's in your Stripe dashboard
+database = "./database/member-db.sqlite3"  # This is where the DB gets put. Configured in db.py
+check_create_db()  # Check and/or create the member database if does not exist. If exist will not overwrite
+login_manager = flask_login.LoginManager()  # Flask login parameters
+login_manager.init_app(app)  # Flask login parameters
 
 
 class User(flask_login.UserMixin):
@@ -163,6 +158,10 @@ def charge():
                 email=request.form['email'],
                 source=request.form['stripeToken']
             )
+            conn = create_connection(database)
+            with conn:
+                member = (customer.id, request.form['email'])
+                member_id = cus_id_save(conn, member)
 
             charge = stripe.Charge.create(
                 customer=customer.id,

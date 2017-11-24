@@ -35,3 +35,10 @@ def select_all_members(conn):
     rows = cur.fetchall()
     for row in rows:
         print(row)
+
+
+def cus_id_save(conn, members):
+    sql = ''' INSERT INTO members(cus_id, email) VALUES (?, ?)'''
+    cur = conn.cursor()
+    cur.execute(sql, members)
+    return cur.lastrowid
