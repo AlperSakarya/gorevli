@@ -11,8 +11,9 @@ The project is intended to be browsed from mobile devices, and can be displayed 
 
 <b>Setup:</b><br>
 - The app will check for the local DB and re-create if does not exist on every run. It does not write an existing DB.
-Just run the routes.py file and install the requirements.
+- Just run the routes.py file and install the requirements.
 Requirements are still not %100 listed but you can figure out from the import list.
+- you need to create an auth.py in the same directory and provide all the API credentials for stripe, square, twilio and admin panel in there.
 
 <b>Language:</b><br>
 - The project is in Turkish, but it's not hard to just replace simple sentences. They are either success or error messages under page names that are in English.
