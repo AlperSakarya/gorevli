@@ -9,7 +9,7 @@ def check_create_db():
     if os.path.isdir("./database") != True:
         os.makedirs(data_path)
     db = sqlite3.connect(data_path + filename + '.sqlite3')
-    db.execute('CREATE TABLE IF NOT EXISTS members (id INTEGER PRIMARY KEY, cus_id VARCHAR, name VARCHAR, phone INT, email VARCHAR)')
+    db.execute('CREATE TABLE IF NOT EXISTS members (id INTEGER PRIMARY KEY, cus_id VARCHAR, name VARCHAR, phone INT, email VARCHAR UNIQUE)')
     db.close()
 
 
@@ -42,3 +42,4 @@ def cus_id_save(conn, members):
     cur = conn.cursor()
     cur.execute(sql, members)
     return cur.lastrowid
+

@@ -52,12 +52,6 @@ def request_loader(request):
 
 @app.route('/')
 def index():
-    # create a database connection
-    conn = create_connection(database)
-    with conn:
-        print("2. Query all customers")
-        select_all_members(conn)
-
     now = datetime.datetime.now()
     return render_template('index.html', year=now.year)
 
@@ -158,10 +152,15 @@ def charge():
                 email=request.form['email'],
                 source=request.form['stripeToken']
             )
+
             conn = create_connection(database)
             with conn:
-                member = (customer.id, request.form['email'])
-                member_id = cus_id_save(conn, member)
+                # Query all customers to check for entry
+                print (select_all_members(conn))
+
+            #with conn:
+            #    member = (customer.id, request.form['email'])
+            #    member_id = cus_id_save(conn, member)
 
             charge = stripe.Charge.create(
                 customer=customer.id,
@@ -186,7 +185,8 @@ def charge():
                     amount=amount
                 )
             except stripe.InvalidRequestError as e:
-                return render_template('donate-response.html', exception_message="Hata olustu", e=e)
+                #return render_template('donate-response.html', exception_message="Hata olustu", e=e)
+                pass
 
             try:
                 customer = stripe.Customer.create(
@@ -197,10 +197,13 @@ def charge():
                 return render_template('donate-response.html', exception_message="Hata olustu", e=e)
 
             try:
-                subscribe = stripe.Plan.create(
+                subscribe = stripe.Subscription.create(
                     customer=customer.id,
-                    items=[{
-                        "plan": plan_id}]
+                    items=[
+                        {
+                            "plan": plan_id,
+                        },
+                    ]
                 )
             except stripe.InvalidRequestError as e:
                 return render_template('donate-response.html', exception_message="Hata olustu", e=e)
