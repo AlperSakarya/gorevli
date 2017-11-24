@@ -7,7 +7,12 @@
             <h1 class="display-3" align="center">{{ exception_message }}</h1>
             <h3>Bu detaylarin ekran goruntusunu cekip gorevliye bildiriniz:</h3>
                 <p class="text-danger"> {{ e }} </p>
-           <a class="btn btn-lg btn-success" href="/" role="button">Geri Don</a>
+           <p align="center"><a class="btn btn-lg btn-success" href="/" role="button">Geri Don</a></p>
+
+        {% elif logout_message %}
+            <h1 class="display-3" align="center">{{ logout_message }}</h1>
+            <h3 align="center">Sistemden ciktiniz.<br>Yeni islem icin tekrar giris yapabilirsiniz</h3>
+            <p align="center"><a class="btn btn-lg btn-success" href="/" role="button">Geri Don</a></p>
 
         {% else %}
             <h1 class="display-3" align="center">Tesekkurler!</h1>

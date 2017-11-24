@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 from __future__ import print_function
+import flask, flask_login
 from flask import Flask, render_template, url_for, request
 from forms import signupform, donationform, LoginForm, SmsForm
 from squareconnect.rest import ApiException
@@ -7,32 +8,55 @@ from squareconnect.apis.customers_api import CustomersApi
 from squareconnect.models.create_customer_request import CreateCustomerRequest
 import stripe
 import uuid, json, unirest, re, time, datetime, os, sqlite3
-from sqlite3 import Error
 import auth  # I pass my Square access token here and import this auth.py file
-from auth import client, auth_token, account_sid, location_id, from_number, access_token, STRIPE_PUBLISHABLE_KEY, STRIPE_SECRET_KEY
+from auth import client, auth_token, account_sid, location_id, from_number, access_token,\
+    STRIPE_PUBLISHABLE_KEY, STRIPE_SECRET_KEY, users
 from db import check_create_db, create_connection, select_all_members
 
 
 # Setting Global Variables
 api_instance = CustomersApi()
 app = Flask(__name__)
+app = flask.Flask(__name__)
 app.secret_key = 'myverylongsecretkey'
 stripe_keys = {'secret_key': STRIPE_SECRET_KEY, 'publishable_key': STRIPE_PUBLISHABLE_KEY}
 stripe.api_key = stripe_keys['secret_key']
 database = "./database/member-db.sqlite3"
 
+
 # Check and/or create the member database if does not exist. If exist will not overwrite
 check_create_db()
+
+login_manager = flask_login.LoginManager()
+login_manager.init_app(app)
+
+
+class User(flask_login.UserMixin):
+    pass
+
+
+@login_manager.user_loader
+def user_loader(email):
+    if email not in users:
+        return
+    user = User()
+    user.id = email
+    return user
+
+
+@login_manager.request_loader
+def request_loader(request):
+    email = request.form.get('email')
+    if email not in users:
+        return
+    user = User()
+    user.id = email
+    user.is_authenticated = request.form['password'] == users[email]['password']
+    return user
 
 
 @app.route('/')
 def index():
-    # create a database connection
-    conn = create_connection(database)
-    with conn:
-        print("2. Query all customers")
-        select_all_members(conn)
-
     now = datetime.datetime.now()
     return render_template('index.html', year=now.year)
 
@@ -61,7 +85,6 @@ def signuprequest():
                 given_name=form.memberName.data,
                 email_address=form.notificationEmail.data,
                 phone_number=form.phoneNumber.data
-
             ))
         else:
             api_response = api_instance.create_customer(CreateCustomerRequest(
@@ -80,16 +103,24 @@ def signuprequest():
 def admin_login():
     form = LoginForm()
     if form.adminEmail.data == auth.admin_Email and form.adminPassword.data == auth.admin_Password:
-        try:
-            api_response = api_instance.list_customers()
-            return render_template('gorevli-paneli.html', api_response=api_response,
-                                   registered_members=len(api_response.customers))
-
-        except ApiException as e:
-            return render_template('login-response.html', exception_message="Hata olustu", e=e)
-
+        user = User()
+        user.id = form.adminEmail.data
+        flask_login.login_user(user)
+        return flask.redirect(flask.url_for('gorevlipaneli'))
     else:
         return render_template('login-response.html', exception_message="Yanlis Bilgi Girildi")
+
+
+@app.route('/gorevlipaneli')
+@flask_login.login_required
+def gorevlipaneli():
+    try:
+        api_response = api_instance.list_customers()
+        return render_template('gorevli-paneli.html', api_response=api_response,
+                               registered_members=len(api_response.customers))
+    except ApiException as e:
+        # username=flask_login.current_user.id We can show which user logged in to the panel by sending this to html
+        return render_template('login-response.html', exception_message="Hata olustu", e=e)
 
 
 @app.route('/send-sms', methods=['POST'])
@@ -175,10 +206,16 @@ def charge():
         return render_template('donate-response.html', amount=amount)
 
 
-@app.route('/test1', methods=['POST'])
-def test1():
-    now = datetime.datetime.now()
-    return render_template('index.html', year=now.year)
+@app.route('/logout')
+def logout():
+    flask_login.logout_user()
+    return render_template('donate-response.html', logout_message="Cikis Tamamlandi")
+
+
+@login_manager.unauthorized_handler
+def unauthorized_handler():
+    e = "Unauthorized. No login credentials provided"
+    return render_template('donate-response.html', exception_message="Erisim Engellendi", e=e)
 
 
 if __name__ == '__main__':
