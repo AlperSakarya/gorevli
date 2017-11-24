@@ -1,0 +1,37 @@
+import os
+import sqlite3
+from sqlite3 import Error
+
+
+def check_create_db():
+    data_path = './database/'
+    filename = 'member-db'
+    if os.path.isdir("./database") != True:
+        os.makedirs(data_path)
+    db = sqlite3.connect(data_path + filename + '.sqlite3')
+    db.execute('CREATE TABLE IF NOT EXISTS members (id INTEGER PRIMARY KEY, cus_id VARCHAR, name VARCHAR, phone INT, email VARCHAR)')
+    db.close()
+
+
+# Create a database connection to the SQLite database specified by the db_file
+def create_connection(db_file):
+    try:
+        conn = sqlite3.connect(db_file)
+        return conn
+    except Error as e:
+        print(e)
+
+    return None
+
+
+def select_all_members(conn):
+    """
+    Query all rows in the tasks table
+    :param conn: the Connection object
+    :return:
+    """
+    cur = conn.cursor()
+    cur.execute("SELECT * FROM members")
+    rows = cur.fetchall()
+    for row in rows:
+        print(row)

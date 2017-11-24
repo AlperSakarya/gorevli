@@ -5,21 +5,34 @@ from forms import signupform, donationform, LoginForm, SmsForm
 from squareconnect.rest import ApiException
 from squareconnect.apis.customers_api import CustomersApi
 from squareconnect.models.create_customer_request import CreateCustomerRequest
-import uuid, json, unirest, re, time, datetime
-import auth  # I pass my Square access token here and import this auth.py file
 import stripe
+import uuid, json, unirest, re, time, datetime, os, sqlite3
+from sqlite3 import Error
+import auth  # I pass my Square access token here and import this auth.py file
 from auth import client, auth_token, account_sid, location_id, from_number, access_token, STRIPE_PUBLISHABLE_KEY, STRIPE_SECRET_KEY
+from db import check_create_db, create_connection, select_all_members
 
 
+# Setting Global Variables
 api_instance = CustomersApi()
 app = Flask(__name__)
 app.secret_key = 'myverylongsecretkey'
 stripe_keys = {'secret_key': STRIPE_SECRET_KEY, 'publishable_key': STRIPE_PUBLISHABLE_KEY}
 stripe.api_key = stripe_keys['secret_key']
+database = "./database/member-db.sqlite3"
+
+# Check and/or create the member database if does not exist. If exist will not overwrite
+check_create_db()
 
 
 @app.route('/')
 def index():
+    # create a database connection
+    conn = create_connection(database)
+    with conn:
+        print("2. Query all customers")
+        select_all_members(conn)
+
     now = datetime.datetime.now()
     return render_template('index.html', year=now.year)
 
@@ -69,7 +82,8 @@ def admin_login():
     if form.adminEmail.data == auth.admin_Email and form.adminPassword.data == auth.admin_Password:
         try:
             api_response = api_instance.list_customers()
-            return render_template('gorevli-paneli.html', api_response=api_response, registered_members=len(api_response.customers))
+            return render_template('gorevli-paneli.html', api_response=api_response,
+                                   registered_members=len(api_response.customers))
 
         except ApiException as e:
             return render_template('login-response.html', exception_message="Hata olustu", e=e)
@@ -159,6 +173,13 @@ def charge():
             return render_template('donate-response.html', exception_message="Hata olustu", e=e)
 
         return render_template('donate-response.html', amount=amount)
+
+
+@app.route('/test1', methods=['POST'])
+def test1():
+    now = datetime.datetime.now()
+    return render_template('index.html', year=now.year)
+
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0')
