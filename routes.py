@@ -57,6 +57,12 @@ def request_loader(request):
 
 @app.route('/')
 def index():
+    # create a database connection
+    conn = create_connection(database)
+    with conn:
+        print("2. Query all customers")
+        select_all_members(conn)
+
     now = datetime.datetime.now()
     return render_template('index.html', year=now.year)
 
