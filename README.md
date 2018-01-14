@@ -6,7 +6,7 @@ The project is intended to be browsed from mobile devices, and can be displayed 
 
 <b>Features:</b><br>
 - One time or recurring donations and payment receipts via Stripe
-- Registered Members are kept in Square (will be moved to a local DB soon)
+- Registered Members are kept in Stripe and in local SQLite DB with their Stripe Customer ID
 - Ability to send SMS to all registered users from the admin panel via twilio
 
 <b>Setup:</b><br>
