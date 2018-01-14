@@ -148,28 +148,46 @@ def charge():
     if str(request.form['recurring']) == "no":  # Checking if user wants to subscribe to monthly donations
 
         try:
-            # Creating the Stripe Customer First
-            customer = stripe.Customer.create(
-                email=request.form['email'],
-                source=request.form['stripeToken']
-            )
 
             conn = create_connection(database)
             with conn:
                 # Query all customers to check for existing email or phone if we do have a match, we will add
                 # the credit card under their cus_ID and then charge the customer
-                print (select_all_members(conn))
+                existing_stripe_id = (select_all_members(conn, request.form['email']))
 
-            #with conn:
-            #    member = (customer.id, request.form['email'])
-            #    member_id = cus_id_save(conn, member)
+                if existing_stripe_id is False:
 
-            charge = stripe.Charge.create(
-                customer=customer.id,
-                amount=amount,
-                currency='usd',
-                description='Vakif Bagis'
-            )
+                    try:
+                        # If customer does not exist in local DB create one in Stripe
+                        # Creating the Stripe Customer
+                        customer = stripe.Customer.create(
+                            email=request.form['email'],
+                            source=request.form['stripeToken']
+                        )
+
+                        # Using new Stripe ID to charge the customer
+                        charge = stripe.Charge.create(
+                            customer=customer.id,
+                            amount=amount,
+                            currency='usd',
+                            description='Vakif Bagis'
+                        )
+
+                        # ADD new customer to local DB
+                        member = (customer.id, request.form['email'])
+                        cus_id_save(conn, member)
+
+                    except ApiException as e:
+                        return render_template('donate-response.html', exception_message="Hata olustu", e=e)
+
+                else:
+                    # Else grab their cus_ID and submit the payment to this cus_ID
+                    charge = stripe.Charge.create(
+                        customer=existing_stripe_id,
+                        amount=amount,
+                        currency='usd',
+                        description='Vakif Bagis'
+                    )
 
         except ApiException as e:
             return render_template('donate-response.html', exception_message="Hata olustu", e=e)

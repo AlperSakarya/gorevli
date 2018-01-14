@@ -24,17 +24,20 @@ def create_connection(db_file):
     return None
 
 
-def select_all_members(conn):
+def select_all_members(conn, member_email):
     """
     Query all rows in the tasks table
     :param conn: the Connection object
     :return:
     """
     cur = conn.cursor()
-    cur.execute("SELECT * FROM members")
+    cur.execute(('SELECT * FROM members WHERE email=?'), (member_email,))
     rows = cur.fetchall()
-    for row in rows:
-        print(row)
+    if len(rows) == 0:
+        return False
+    else:
+        return rows[0][1]
+
 
 
 def cus_id_save(conn, members):
