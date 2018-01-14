@@ -148,6 +148,7 @@ def charge():
     if str(request.form['recurring']) == "no":  # Checking if user wants to subscribe to monthly donations
 
         try:
+            # Creating the Stripe Customer First
             customer = stripe.Customer.create(
                 email=request.form['email'],
                 source=request.form['stripeToken']
@@ -155,7 +156,8 @@ def charge():
 
             conn = create_connection(database)
             with conn:
-                # Query all customers to check for entry
+                # Query all customers to check for existing email or phone if we do have a match, we will add
+                # the credit card under their cus_ID and then charge the customer
                 print (select_all_members(conn))
 
             #with conn:
@@ -185,7 +187,7 @@ def charge():
                     amount=amount
                 )
             except stripe.InvalidRequestError as e:
-                #return render_template('donate-response.html', exception_message="Hata olustu", e=e)
+                return render_template('donate-response.html', exception_message="Hata olustu", e=e)
                 pass
 
             try:
