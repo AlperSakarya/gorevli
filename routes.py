@@ -148,7 +148,6 @@ def charge():
     if str(request.form['recurring']) == "no":  # Checking if user wants to subscribe to monthly donations
 
         try:
-
             conn = create_connection(database)
             with conn:
                 # Query all customers to check for existing email or phone if we do have a match, we will add
@@ -158,8 +157,7 @@ def charge():
                 if existing_stripe_id is False:
 
                     try:
-                        # If customer does not exist in local DB create one in Stripe
-                        # Creating the Stripe Customer
+                        # Customer does not exist in local DB create one in Stripe
                         customer = stripe.Customer.create(
                             email=request.form['email'],
                             source=request.form['stripeToken']
@@ -173,7 +171,7 @@ def charge():
                             description='Vakif Bagis'
                         )
 
-                        # ADD new customer to local DB
+                        # ADD new info to local DB
                         member = (customer.id, request.form['email'])
                         cus_id_save(conn, member)
 
@@ -181,7 +179,7 @@ def charge():
                         return render_template('donate-response.html', exception_message="Hata olustu", e=e)
 
                 else:
-                    # Else grab their cus_ID and submit the payment to this cus_ID
+                    # Else grab their cus_ID from DB and submit the payment with this cus_ID to Stripe
                     charge = stripe.Charge.create(
                         customer=existing_stripe_id,
                         amount=amount,
@@ -193,9 +191,10 @@ def charge():
             return render_template('donate-response.html', exception_message="Hata olustu", e=e)
 
         return render_template('donate-response.html', amount=amount)
-    else:
+
+    else:  # This means user does want recurring payments, processing them.
         try:
-            try:
+            try:  # Creating a new Stripe plan named with user's email address
                 plan_id = request.form['email']
                 plan = stripe.Plan.create(
                     name="Monthly Donation",
@@ -208,23 +207,58 @@ def charge():
                 return render_template('donate-response.html', exception_message="Hata olustu", e=e)
                 pass
 
-            try:
-                customer = stripe.Customer.create(
-                    email=request.form['email'],
-                    source=request.form['stripeToken']
-                )
-            except stripe.InvalidRequestError as e:
-                return render_template('donate-response.html', exception_message="Hata olustu", e=e)
+            try:  # Checking the customer in local DB if not creating one, later this will be it's own class
+                conn = create_connection(database)
+                with conn:
+                    # Query all customers to check for existing email or phone if we do have a match, we will add
+                    # the credit card under their cus_ID and then charge the customer
+                    existing_stripe_id = (select_all_members(conn, request.form['email']))
 
-            try:
-                subscribe = stripe.Subscription.create(
-                    customer=customer.id,
-                    items=[
-                        {
-                            "plan": plan_id,
-                        },
-                    ]
-                )
+                    if existing_stripe_id is False:
+
+                        try:
+                            # Customer does not exist in local DB create one in Stripe
+                            customer = stripe.Customer.create(
+                                email=request.form['email'],
+                                source=request.form['stripeToken']
+                            )
+
+                            # Using new Stripe ID to charge the customer
+                            charge = stripe.Charge.create(
+                                customer=customer.id,
+                                amount=amount,
+                                currency='usd',
+                                description='Vakif Bagis'
+                            )
+
+                            # ADD new customer to local DB
+                            member = (customer.id, request.form['email'])
+                            cus_id_save(conn, member)
+
+                            # Creating a new Stripe plan named with user's email address
+                            subscribe = stripe.Subscription.create(
+                                customer=customer.id,
+                                items=[
+                                    {
+                                        "plan": plan_id,
+                                    },
+                                ]
+                            )
+
+                        except ApiException as e:
+                            return render_template('donate-response.html', exception_message="Hata olustu", e=e)
+
+                    else:
+                        # Else grab their cus_ID and make plan association to this cus_ID
+                        subscribe = stripe.Subscription.create(
+                            customer=existing_stripe_id,
+                            items=[
+                                {
+                                    "plan": plan_id,
+                                },
+                            ]
+                        )
+
             except stripe.InvalidRequestError as e:
                 return render_template('donate-response.html', exception_message="Hata olustu", e=e)
 
@@ -247,4 +281,4 @@ def unauthorized_handler():
 
 
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0')
+    app.run(host='0.0.0.0')

@@ -6,10 +6,11 @@ from sqlite3 import Error
 def check_create_db():
     data_path = './database/'
     filename = 'member-db'
-    if os.path.isdir("./database") != True:
+    if os.path.isdir("./database") is not True:
         os.makedirs(data_path)
     db = sqlite3.connect(data_path + filename + '.sqlite3')
-    db.execute('CREATE TABLE IF NOT EXISTS members (id INTEGER PRIMARY KEY, cus_id VARCHAR, name VARCHAR, phone INT, email VARCHAR UNIQUE)')
+    db.execute('CREATE TABLE IF NOT EXISTS members (id INTEGER PRIMARY KEY, cus_id VARCHAR, name VARCHAR, '
+               'phone INT, email VARCHAR UNIQUE)')
     db.close()
 
 
@@ -37,7 +38,6 @@ def select_all_members(conn, member_email):
         return False
     else:
         return rows[0][1]
-
 
 
 def cus_id_save(conn, members):
