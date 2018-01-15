@@ -278,18 +278,6 @@ def charge():
                                 source=request.form['stripeToken']
                             )
 
-                            # Using new Stripe ID to charge the customer
-                            charge = stripe.Charge.create(
-                                customer=customer.id,
-                                amount=amount,
-                                currency='usd',
-                                description='Vakif Bagis'
-                            )
-
-                            # ADD new customer to local DB
-                            member = (customer.id, request.form['email'])
-                            cus_id_save(conn, member)
-
                             # Creating a new Stripe plan named with user's email address
                             subscribe = stripe.Subscription.create(
                                 customer=customer.id,
@@ -299,6 +287,10 @@ def charge():
                                     },
                                 ]
                             )
+
+                            # ADD new customer to local DB
+                            member = (customer.id, request.form['email'])
+                            cus_id_save(conn, member)
 
                         except ApiException as e:
                             return render_template('donate-response.html', exception_message="Hata olustu", e=e)
