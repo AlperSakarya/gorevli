@@ -50,9 +50,8 @@ def cus_comm_save(conn, members):
 
 
 def cus_name_phone_save(conn, members):
-    sql = ''' INSERT INTO members(name, phone) VALUES (?, ?)'''
     cur = conn.cursor()
-    cur.execute(sql, members)
+    cur.execute('UPDATE members SET name =?, phone =?  WHERE email =?', members)
     return cur.lastrowid
 
 

@@ -99,8 +99,8 @@ def signuprequest():
                         return render_template('donate-response.html', exception_message="Hata olustu", e=e)
 
                 else:
-                    member = (form.memberName.data, form.phoneNumber.data)
-                    cus_comm_save(conn, member)
+                    member = (form.memberName.data, form.phoneNumber.data, form.notificationEmail.data)
+                    cus_name_phone_save(conn, member)
 
             else:
                 return render_template('signup-response.html', exception="Email Mecburi")
@@ -333,4 +333,4 @@ def unauthorized_handler():
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0')
+    app.run(debug=True, host='0.0.0.0')
