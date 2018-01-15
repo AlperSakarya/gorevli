@@ -109,9 +109,27 @@ def admin_login():
 @app.route('/gorevlipaneli')
 @flask_login.login_required
 def gorevlipaneli():
+    return render_template('gorevli-paneli.html')
+
+
+@app.route('/iletisimpaneli')
+@flask_login.login_required
+def iletisim_paneli():
     try:
         api_response = api_instance.list_customers()
-        return render_template('gorevli-paneli.html', api_response=api_response,
+        return render_template('iletisim-paneli.html', api_response=api_response,
+                               registered_members=len(api_response.customers))
+    except ApiException as e:
+        # username=flask_login.current_user.id We can show which user logged in to the panel by sending this to html
+        return render_template('login-response.html', exception_message="Hata olustu", e=e)
+
+
+@app.route('/aidatpaneli')
+@flask_login.login_required
+def aidat_paneli():
+    try:
+        api_response = api_instance.list_customers()
+        return render_template('iletisim-paneli.html', api_response=api_response,
                                registered_members=len(api_response.customers))
     except ApiException as e:
         # username=flask_login.current_user.id We can show which user logged in to the panel by sending this to html
