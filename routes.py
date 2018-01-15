@@ -128,9 +128,9 @@ def iletisim_paneli():
 @flask_login.login_required
 def aidat_paneli():
     try:
-        api_response = api_instance.list_customers()
-        return render_template('iletisim-paneli.html', api_response=api_response,
-                               registered_members=len(api_response.customers))
+        api_response = stripe.Subscription.list(limit=100)
+        return render_template('aidat-paneli.html', api_response=api_response,
+                               registered_members=len(api_response.data))
     except ApiException as e:
         # username=flask_login.current_user.id We can show which user logged in to the panel by sending this to html
         return render_template('login-response.html', exception_message="Hata olustu", e=e)
