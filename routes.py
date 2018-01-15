@@ -164,8 +164,10 @@ def send_sms_message():
                 registered_members += 1
                 time.sleep(1)
 
-        except Exception as e:
-            return render_template('gorevli-paneli.html', api_response=message, exception=e)
+        except:
+            e = "There was a problem, most likely an invalid number in the member list"
+            return render_template('iletisim-paneli.html', api_response=members, exception=e,
+                                   success_message="SMS was sent to all members!", registered_members=registered_members)
 
     return render_template('iletisim-paneli.html', api_response=members,
                            success_message="SMS was sent to all members!", registered_members=registered_members)
