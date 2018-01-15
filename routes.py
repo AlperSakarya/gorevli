@@ -134,9 +134,13 @@ def gorevlipaneli():
 @flask_login.login_required
 def iletisim_paneli():
     try:
-        api_response = api_instance.list_customers()
-        return render_template('iletisim-paneli.html', api_response=api_response,
-                               registered_members=len(api_response.customers))
+        #api_response = api_instance.list_customers()
+        conn = create_connection(database)
+        with conn:
+            members = get_members(conn)
+
+        return render_template('iletisim-paneli.html', api_response=members,
+                               registered_members=len(members))
     except ApiException as e:
         # username=flask_login.current_user.id We can show which user logged in to the panel by sending this to html
         return render_template('login-response.html', exception_message="Hata olustu", e=e)
@@ -162,19 +166,24 @@ def send_sms_message():
     sms_message = form.sms_content.data
     registered_members = 0
 
-    try:
-        api_response = api_instance.list_customers()
-        for i in api_response.customers:
-            if type(i.phone_number) == str:
-                member_number = re.sub("[^0-9]", "", i.phone_number)
-                message = client.api.account.messages.create(to=member_number, from_=from_number, body=sms_message)
+    conn = create_connection(database)
+    with conn:
+        try:
+        #api_response = api_instance.list_customers()
+        #for i in api_response.customers:
+        #    if type(i.phone_number) == str:
+            members = get_members(conn)
+            member_number = get_member_phones(conn)
+            for number in member_number:
+                number = re.sub("[^0-9]", "", str(number))
+                message = client.api.account.messages.create(to=number, from_=from_number, body=sms_message)
                 registered_members += 1
                 time.sleep(1)
 
-    except ApiException as e:
-        return render_template('gorevli-paneli.html', api_response=api_response, exception=e)
+        except ApiException as e:
+            return render_template('gorevli-paneli.html', api_response=message, exception=e)
 
-    return render_template('gorevli-paneli.html', api_response=api_response,
+    return render_template('iletisim-paneli.html', api_response=members,
                            success_message="SMS was sent to all members!", registered_members=registered_members)
 
 
@@ -239,13 +248,13 @@ def charge():
                         return render_template('donate-response.html', exception_message="Hata olustu", e=e)
 
                     # Disabling Square member registry for now as I will take that out
-                    '''# Else grab their cus_ID from DB and submit the payment with this cus_ID to Stripe
-                    charge = stripe.Charge.create(
-                        customer=existing_stripe_id,
-                        amount=amount,
-                        currency='usd',
-                        description='Vakif Bagis'
-                    )'''
+                    # Else grab their cus_ID from DB and submit the payment with this cus_ID to Stripe
+                    #charge = stripe.Charge.create(
+                    #    customer=existing_stripe_id,
+                    #    amount=amount,
+                    #    currency='usd',
+                    #    description='Vakif Bagis'
+                    #)
 
         except ApiException as e:
             return render_template('donate-response.html', exception_message="Hata olustu", e=e)

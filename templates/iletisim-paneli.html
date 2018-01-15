@@ -35,19 +35,13 @@
                 <th> EMAIL </th>
             </tr>
 
-            {% for i in api_response.customers %}
-
-                {% if i.phone_number != None %}
+            {% for member in api_response %}
 
                     <tr>
-                        <td style="border-bottom:3px solid black" align="center"> {{ i.given_name }} </td>
-                        <td style="border-bottom:3px solid black" align="center"> {{ i.phone_number }} </td>
-                        <td style="border-bottom:3px solid black" align="center"> {{ i.email_address }} </td>
+                        <td style="border-bottom:3px solid black" align="center"> {{ member[2]}} </td>
+                        <td style="border-bottom:3px solid black" align="center"> {{ member[3] }} </td>
+                        <td style="border-bottom:3px solid black" align="center"> {{ member[4] }} </td>
                     </tr>
-
-                {% else %}
-
-              {% endif %}
 
             {% endfor %}
         </table>

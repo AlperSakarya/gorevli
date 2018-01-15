@@ -59,3 +59,22 @@ def cus_id_add(conn, member):
     cur = conn.cursor()
     cur.execute('UPDATE members SET cus_id =? WHERE email =?', member)
     return cur.lastrowid
+
+
+def get_member_phones(conn):
+    cur = conn.cursor()
+    cur.execute('SELECT phone FROM members WHERE phone IS NOT NULL')
+    rows = cur.fetchall()
+    if len(rows) == 0:
+        return False
+    else:
+        return rows
+
+def get_members(conn):
+    cur = conn.cursor()
+    cur.execute('SELECT * FROM members WHERE phone IS NOT NULL')
+    rows = cur.fetchall()
+    if len(rows) == 0:
+        return False
+    else:
+        return rows
