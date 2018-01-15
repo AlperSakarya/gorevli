@@ -85,11 +85,11 @@ def signuprequest():
 
                     try:
                         # Square Customer Create
-                        api_response = api_instance.create_customer(CreateCustomerRequest(
-                            given_name=form.memberName.data,
-                            email_address=form.notificationEmail.data,
-                            phone_number=form.phoneNumber.data
-                         ))
+                        #api_response = api_instance.create_customer(CreateCustomerRequest(
+                        #    given_name=form.memberName.data,
+                        #    email_address=form.notificationEmail.data,
+                        #    phone_number=form.phoneNumber.data
+                        # ))
 
                         # ADD new info to local DB
                         member = (form.memberName.data, form.phoneNumber.data, form.notificationEmail.data)
@@ -97,6 +97,11 @@ def signuprequest():
 
                     except ApiException as e:
                         return render_template('donate-response.html', exception_message="Hata olustu", e=e)
+
+                else:
+                    member = (form.memberName.data, form.phoneNumber.data)
+                    cus_comm_save(conn, member)
+
             else:
                 return render_template('signup-response.html', exception="Email Mecburi")
 
@@ -233,7 +238,7 @@ def charge():
                     except ApiException as e:
                         return render_template('donate-response.html', exception_message="Hata olustu", e=e)
 
-                    # Disabling Square member registery for now as I will take that out
+                    # Disabling Square member registry for now as I will take that out
                     '''# Else grab their cus_ID from DB and submit the payment with this cus_ID to Stripe
                     charge = stripe.Charge.create(
                         customer=existing_stripe_id,
