@@ -30,9 +30,10 @@
     <div>
         <table border="1px" align="center">
             <tr>
-                <th> NAME </th>
-                <th> PHONE </th>
-                <th> EMAIL </th>
+                <th><div align="center"> NAME </div></th>
+                <th><div align="center"> PHONE </div></th>
+                <th><div align="center"> EMAIL </div></th>
+                <th><div align="center"> DELETE </div></th>
             </tr>
 
             {% for member in api_response %}
@@ -41,6 +42,8 @@
                         <td style="border-bottom:3px solid black" align="center"> {{ member[2]}} </td>
                         <td style="border-bottom:3px solid black" align="center"> {{ member[3] }} </td>
                         <td style="border-bottom:3px solid black" align="center"> {{ member[4] }} </td>
+                        <td style="border-bottom:3px solid black" align="center">
+                            <input type="submit" value="DELETE" class="btn btn-success btn-xs btn-block" role="button">  </td>
                     </tr>
 
             {% endfor %}
