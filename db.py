@@ -26,11 +26,6 @@ def create_connection(db_file):
 
 
 def select_all_members(conn, member_email):
-    """
-    Query all rows in the tasks table
-    :param conn: the Connection object
-    :return:
-    """
     cur = conn.cursor()
     cur.execute(('SELECT * FROM members WHERE email=?'), (member_email,))
     rows = cur.fetchall()
@@ -46,3 +41,15 @@ def cus_id_save(conn, members):
     cur.execute(sql, members)
     return cur.lastrowid
 
+
+def cus_comm_save(conn, members):
+    sql = ''' INSERT INTO members(name, phone, email) VALUES (?, ?, ?)'''
+    cur = conn.cursor()
+    cur.execute(sql, members)
+    return cur.lastrowid
+
+
+def cus_id_add(conn, member):
+    cur = conn.cursor()
+    cur.execute('UPDATE members SET cus_id =? WHERE email =?', member)
+    return cur.lastrowid

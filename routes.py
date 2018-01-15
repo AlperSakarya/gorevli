@@ -74,24 +74,37 @@ def admin_login_page():
 @app.route('/signuprequest', methods=['POST'])
 def signuprequest():
     form = signupform()
-    try:
-        if form.notificationEmail.data != "":
-            api_response = api_instance.create_customer(CreateCustomerRequest(
-                given_name=form.memberName.data,
-                email_address=form.notificationEmail.data,
-                phone_number=form.phoneNumber.data
-            ))
-        else:
-            api_response = api_instance.create_customer(CreateCustomerRequest(
-                given_name=form.memberName.data,
-                phone_number=form.phoneNumber.data
-            ))
+    conn = create_connection(database)
+    with conn:
+        try:
+            if form.notificationEmail.data != "":
+                # Query all customers to check for existing email or phone if we do have a match, we will add
+                # the credit card under their cus_ID and then charge the customer
+                existing_stripe_id = (select_all_members(conn, form.notificationEmail.data))
+                if existing_stripe_id is False:
 
-        return render_template('signup-response.html', exception="", isim=form.memberName.data,
-                               email=form.notificationEmail.data, telefon=form.phoneNumber.data)
+                    try:
+                        # Square Customer Create
+                        api_response = api_instance.create_customer(CreateCustomerRequest(
+                            given_name=form.memberName.data,
+                            email_address=form.notificationEmail.data,
+                            phone_number=form.phoneNumber.data
+                         ))
 
-    except ApiException as e:
-        return render_template('signup-response.html', exception=e.body)
+                        # ADD new info to local DB
+                        member = (form.memberName.data, form.phoneNumber.data, form.notificationEmail.data)
+                        cus_comm_save(conn, member)
+
+                    except ApiException as e:
+                        return render_template('donate-response.html', exception_message="Hata olustu", e=e)
+            else:
+                return render_template('signup-response.html', exception="Email Mecburi")
+
+            return render_template('signup-response.html', exception="", isim=form.memberName.data,
+                                   email=form.notificationEmail.data, telefon=form.phoneNumber.data)
+
+        except ApiException as e:
+            return render_template('signup-response.html', exception=e.body)
 
 
 @app.route('/adminlogin', methods=['POST'])
@@ -196,14 +209,38 @@ def charge():
                     except ApiException as e:
                         return render_template('donate-response.html', exception_message="Hata olustu", e=e)
 
-                else:
-                    # Else grab their cus_ID from DB and submit the payment with this cus_ID to Stripe
+                elif existing_stripe_id is None:
+                    try:
+                        # Customer does not exist in local DB create one in Stripe
+                        customer = stripe.Customer.create(
+                            email=request.form['email'],
+                            source=request.form['stripeToken']
+                        )
+
+                        # Using new Stripe ID to charge the customer
+                        charge = stripe.Charge.create(
+                            customer=customer.id,
+                            amount=amount,
+                            currency='usd',
+                            description='Vakif Bagis'
+                        )
+
+                        # Adding the non/existing customer ID to the DB for existing customer
+                        # Customer/Email was added via newsletter panel
+                        member = (customer.id, request.form['email'])
+                        cus_id_add(conn, member)
+
+                    except ApiException as e:
+                        return render_template('donate-response.html', exception_message="Hata olustu", e=e)
+
+                    # Disabling Square member registery for now as I will take that out
+                    '''# Else grab their cus_ID from DB and submit the payment with this cus_ID to Stripe
                     charge = stripe.Charge.create(
                         customer=existing_stripe_id,
                         amount=amount,
                         currency='usd',
                         description='Vakif Bagis'
-                    )
+                    )'''
 
         except ApiException as e:
             return render_template('donate-response.html', exception_message="Hata olustu", e=e)
