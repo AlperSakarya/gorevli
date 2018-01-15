@@ -5,7 +5,6 @@ from flask import Flask, render_template, url_for, request
 from forms import signupform, donationform, LoginForm, SmsForm
 from squareconnect.rest import ApiException
 from squareconnect.apis.customers_api import CustomersApi
-from squareconnect.models.create_customer_request import CreateCustomerRequest
 import stripe
 import uuid, json, unirest, re, time, datetime
 import auth  # I pass my Square access token here and import this auth.py file
@@ -84,13 +83,6 @@ def signuprequest():
                 if existing_stripe_id is False:
 
                     try:
-                        # Square Customer Create
-                        #api_response = api_instance.create_customer(CreateCustomerRequest(
-                        #    given_name=form.memberName.data,
-                        #    email_address=form.notificationEmail.data,
-                        #    phone_number=form.phoneNumber.data
-                        # ))
-
                         # ADD new info to local DB
                         member = (form.memberName.data, form.phoneNumber.data, form.notificationEmail.data)
                         cus_comm_save(conn, member)
@@ -134,7 +126,6 @@ def gorevlipaneli():
 @flask_login.login_required
 def iletisim_paneli():
     try:
-        #api_response = api_instance.list_customers()
         conn = create_connection(database)
         with conn:
             members = get_members(conn)
@@ -169,9 +160,6 @@ def send_sms_message():
     conn = create_connection(database)
     with conn:
         try:
-        #api_response = api_instance.list_customers()
-        #for i in api_response.customers:
-        #    if type(i.phone_number) == str:
             members = get_members(conn)
             member_number = get_member_phones(conn)
             for number in member_number:
@@ -246,15 +234,6 @@ def charge():
 
                     except ApiException as e:
                         return render_template('donate-response.html', exception_message="Hata olustu", e=e)
-
-                    # Disabling Square member registry for now as I will take that out
-                    # Else grab their cus_ID from DB and submit the payment with this cus_ID to Stripe
-                    #charge = stripe.Charge.create(
-                    #    customer=existing_stripe_id,
-                    #    amount=amount,
-                    #    currency='usd',
-                    #    description='Vakif Bagis'
-                    #)
 
         except ApiException as e:
             return render_template('donate-response.html', exception_message="Hata olustu", e=e)
