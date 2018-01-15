@@ -3,8 +3,6 @@ from __future__ import print_function
 import flask, flask_login
 from flask import Flask, render_template, url_for, request
 from forms import signupform, donationform, LoginForm, SmsForm
-from squareconnect.rest import ApiException
-from squareconnect.apis.customers_api import CustomersApi
 import stripe
 import uuid, json, unirest, re, time, datetime
 import auth  # I pass my Square access token here and import this auth.py file
@@ -13,7 +11,6 @@ from auth import client, auth_token, account_sid, location_id, from_number, acce
 from db import *
 
 # Setting Global Variables
-api_instance = CustomersApi()
 app = Flask(__name__)
 app = flask.Flask(__name__)
 app.secret_key = 'myverylongsecretkey' #  Change this in your production
@@ -87,7 +84,7 @@ def signuprequest():
                         member = (form.memberName.data, form.phoneNumber.data, form.notificationEmail.data)
                         cus_comm_save(conn, member)
 
-                    except ApiException as e:
+                    except Exception as e:
                         return render_template('donate-response.html', exception_message="Hata olustu", e=e)
 
                 else:
@@ -100,7 +97,7 @@ def signuprequest():
             return render_template('signup-response.html', exception="", isim=form.memberName.data,
                                    email=form.notificationEmail.data, telefon=form.phoneNumber.data)
 
-        except ApiException as e:
+        except Exception as e:
             return render_template('signup-response.html', exception=e.body)
 
 
@@ -132,7 +129,7 @@ def iletisim_paneli():
 
         return render_template('iletisim-paneli.html', api_response=members,
                                registered_members=len(members))
-    except ApiException as e:
+    except Exception as e:
         # username=flask_login.current_user.id We can show which user logged in to the panel by sending this to html
         return render_template('login-response.html', exception_message="Hata olustu", e=e)
 
@@ -144,7 +141,7 @@ def aidat_paneli():
         api_response = stripe.Subscription.list(limit=100)
         return render_template('aidat-paneli.html', api_response=api_response,
                                registered_members=len(api_response.data))
-    except ApiException as e:
+    except Exception as e:
         # username=flask_login.current_user.id We can show which user logged in to the panel by sending this to html
         return render_template('login-response.html', exception_message="Hata olustu", e=e)
 
@@ -156,7 +153,6 @@ def send_sms_message():
     form = SmsForm()
     sms_message = form.sms_content.data
     registered_members = 0
-
     conn = create_connection(database)
     with conn:
         try:
@@ -168,7 +164,7 @@ def send_sms_message():
                 registered_members += 1
                 time.sleep(1)
 
-        except ApiException as e:
+        except Exception as e:
             return render_template('gorevli-paneli.html', api_response=message, exception=e)
 
     return render_template('iletisim-paneli.html', api_response=members,
@@ -208,7 +204,7 @@ def charge():
                         member = (customer.id, request.form['email'])
                         cus_id_save(conn, member)
 
-                    except ApiException as e:
+                    except Exception as e:
                         return render_template('donate-response.html', exception_message="Hata olustu", e=e)
 
                 elif existing_stripe_id is None:
@@ -232,10 +228,10 @@ def charge():
                         member = (customer.id, request.form['email'])
                         cus_id_add(conn, member)
 
-                    except ApiException as e:
+                    except Exception as e:
                         return render_template('donate-response.html', exception_message="Hata olustu", e=e)
 
-        except ApiException as e:
+        except Exception as e:
             return render_template('donate-response.html', exception_message="Hata olustu", e=e)
 
         return render_template('donate-response.html', amount=amount)
@@ -285,7 +281,7 @@ def charge():
                             member = (customer.id, request.form['email'])
                             cus_id_save(conn, member)
 
-                        except ApiException as e:
+                        except Exception as e:
                             return render_template('donate-response.html', exception_message="Hata olustu", e=e)
 
                     else:
@@ -302,7 +298,7 @@ def charge():
             except stripe.InvalidRequestError as e:
                 return render_template('donate-response.html', exception_message="Hata olustu", e=e)
 
-        except ApiException as e:
+        except Exception as e:
             return render_template('donate-response.html', exception_message="Hata olustu", e=e)
 
         return render_template('donate-response.html', amount=amount)
