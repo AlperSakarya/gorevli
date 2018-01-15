@@ -5,7 +5,7 @@ from flask import Flask, render_template, url_for, request
 from forms import signupform, donationform, LoginForm, SmsForm
 import stripe
 import uuid, json, unirest, re, time, datetime
-import auth  # I pass my Square access token here and import this auth.py file
+import auth  # I pass my access tokens here and import this auth.py file
 from auth import client, auth_token, account_sid, location_id, from_number, access_token,\
     STRIPE_PUBLISHABLE_KEY, STRIPE_SECRET_KEY, users
 from db import *
@@ -148,7 +148,7 @@ def aidat_paneli():
 
 @app.route('/send-sms', methods=['POST'])
 def send_sms_message():
-    # List customers from Square and SMS with twilio
+    # List customers from local DB and SMS with twilio
     # Setting from number for members
     form = SmsForm()
     sms_message = form.sms_content.data
