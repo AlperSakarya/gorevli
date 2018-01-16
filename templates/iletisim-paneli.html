@@ -36,18 +36,22 @@
                 <th><div align="center"> DELETE </div></th>
             </tr>
 
+        {%  if member %}
             {% for member in api_response %}
-
-                    <tr>
-                        <td style="border-bottom:3px solid black" align="center"> {{ member[2]}} </td>
-                        <td style="border-bottom:3px solid black" align="center"> {{ member[3] }} </td>
-                        <td style="border-bottom:3px solid black" align="center"> {{ member[4] }} </td>
-                        <td style="border-bottom:3px solid black" align="center">
-                            <input type="submit" value="DELETE" class="btn btn-success btn-xs btn-block" role="button">
-                        </td>
-                    </tr>
-
+                <tr>
+                    <td style="border-bottom:3px solid black" align="center"> {{ member[2]}} </td>
+                    <td style="border-bottom:3px solid black" align="center"> {{ member[3] }} </td>
+                    <td style="border-bottom:3px solid black" align="center">
+                                    <form action="/deletemember" method="post">
+                                        <input type="hidden" name="email" value="{{ member[4] }}"> {{ member[4] }}
+                    </td>
+                    <td style="border-bottom:3px solid black" name="delete" align="center">
+                        <input type="submit" value="DELETE" class="btn btn-success btn-xs btn-block" role="button">
+                        </form>
+                    </td>
+                </tr>
             {% endfor %}
+        {% endif %}
         </table>
     </div>
     <br>
@@ -55,6 +59,6 @@
         <a href="/gorevlipaneli" class="btn btn-success btn-lg btn-block">GERI</a>
     </div>
 
-    </div>
+</div>
 
 {% endblock %}

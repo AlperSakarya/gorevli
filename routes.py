@@ -126,9 +126,11 @@ def iletisim_paneli():
         conn = create_connection(database)
         with conn:
             members = get_members(conn)
-
-        return render_template('iletisim-paneli.html', api_response=members,
-                               registered_members=len(members))
+            if members is False:
+                member_count = 0
+            else:
+                member_count = len(members)
+            return render_template('iletisim-paneli.html', api_response=members, registered_members=member_count)
     except Exception as e:
         # username=flask_login.current_user.id We can show which user logged in to the panel by sending this to html
         return render_template('login-response.html', exception_message="Hata olustu", e=e)
@@ -144,6 +146,22 @@ def aidat_paneli():
     except Exception as e:
         # username=flask_login.current_user.id We can show which user logged in to the panel by sending this to html
         return render_template('login-response.html', exception_message="Hata olustu", e=e)
+
+
+@app.route('/deletemember', methods=['POST'])
+@flask_login.login_required
+def delete_member():
+    conn = create_connection(database)
+    with conn:
+        email = request.form['email']
+        delete_comm_member(conn, email)
+        members = get_members(conn)
+        if members is False:
+            member_count = 0
+        else:
+            member_count = len(members)
+
+        return render_template('iletisim-paneli.html', api_response=members, registered_members=member_count)
 
 
 @app.route('/send-sms', methods=['POST'])

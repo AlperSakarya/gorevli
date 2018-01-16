@@ -87,3 +87,10 @@ def get_members(conn):
         return False
     else:
         return rows
+
+
+# SQL query to delete selected member from the SMS DB
+def delete_comm_member(conn, email):
+    cur = conn.cursor()
+    cur.execute(('DELETE FROM members WHERE email=?'), (email,))
+    #return cur.lastrowid
