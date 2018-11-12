@@ -160,7 +160,6 @@ def delete_member():
             member_count = 0
         else:
             member_count = len(members)
-
         return render_template('iletisim-paneli.html', api_response=members, registered_members=member_count)
 
 
