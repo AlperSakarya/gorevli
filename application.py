@@ -220,7 +220,8 @@ def charge():
                         )
 
                         # ADD new info to local DB
-                        member = (customer.id, request.form['email'])
+
+                        member = (customer.id, request.form['name'], request.form['phone'], request.form['email'])
                         cus_id_save(conn, member)
 
                     except Exception as e:
@@ -297,7 +298,7 @@ def charge():
                             )
 
                             # ADD new customer to local DB
-                            member = (customer.id, request.form['email'])
+                            member = (customer.id, request.form['name'], request.form['phone'], request.form['email'])
                             cus_id_save(conn, member)
 
                         except Exception as e:

@@ -36,7 +36,7 @@
                 <th><div align="center"> DELETE </div></th>
             </tr>
 
-        {%  if member %}
+        {% if api_response %}
             {% for member in api_response %}
                 <tr>
                     <td style="border-bottom:3px solid black" align="center"> {{ member[2]}} </td>

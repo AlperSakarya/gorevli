@@ -6,22 +6,24 @@
     <p><h2 class="form-signin-heading" align="center">Aylik Aidat Listesi</h2></p>
 
     <p align="center">Total Paying Members: {{ registered_members }}<b></b></p>
+    <p align="center">Total Monthly Amount: <b></b></p>
     <div>
-        <table border="1px" align="center">
-            <tr>
+        <table border="1px" align="center" id="donating-members">
+            <thead>
                 <th> NAME </th>
                 <th> AMOUNT </th>
                 <th> INTERVAL </th>
-            </tr>
-
+            </thead>
+            <tbody>
             {% for i in api_response %}
                     <tr>
                         <td style="border-bottom:3px solid black" align="center"> {{ i['items']['data'][0]['plan']['id'] }} </td>
-                        <td style="border-bottom:3px solid black" align="center"> ${{ i['items']['data'][0]['plan']['amount'] / 100 }} </td>
+                        <td style="border-bottom:3px solid black" align="center" class="donation-amount"> ${{ i['items']['data'][0]['plan']['amount'] / 100 }} </td>
                         <td style="border-bottom:3px solid black" align="center"> {{ i['items']['data'][0]['plan']['interval'] }} </td>
                     </tr>
 
             {% endfor %}
+            </tbody>
         </table>
     </div>
 

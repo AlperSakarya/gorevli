@@ -39,7 +39,7 @@ def select_all_members(conn, member_email):
 
 # DB query to save the newly created Stripe customer ID in to the DB for future charges so that charges can be tracked
 def cus_id_save(conn, members):
-    sql = ''' INSERT INTO members(cus_id, email) VALUES (?, ?)'''
+    sql = ''' INSERT INTO members(cus_id, name, phone, email) VALUES (?, ?, ?, ?)'''
     cur = conn.cursor()
     cur.execute(sql, members)
     return cur.lastrowid
