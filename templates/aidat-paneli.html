@@ -5,24 +5,43 @@
 
     <p><h2 class="form-signin-heading" align="center">Aylik Aidat Listesi</h2></p>
 
-    <p align="center">Total Paying Members: {{ registered_members }}<b></b></p>
-    <p align="center">Total Monthly Amount: <b></b></p>
+        {% if success_message %}
+            <div class="alert alert-success" role="alert"><span class="label label-success">Success</span> {{ success_message }}</div><p>
+        {% endif %}
+
+        {% if e %}
+            <span class="label label-danger">Error</span><br>
+            <div class="alert alert-danger" role="alert">{{ e }}</div><p>
+        {% endif %}
+
+
+    <p align="center">Total Paying Members: <strong>{{ registered_members }}</strong><b></b></p>
+    <p align="center">Total Monthly Recurring: <strong>${{ total }}</strong><b></b></p>
     <div>
         <table border="1px" align="center" id="donating-members">
             <thead>
-                <th> NAME </th>
-                <th> AMOUNT </th>
-                <th> INTERVAL </th>
+                <th><div align="center"> NAME </div></th>
+                <th><div align="center"> AMOUNT </div></th>
+                <th><div align="center"> INTERVAL </div></th>
+                <th><div align="center"> DELETE </div></th>
             </thead>
             <tbody>
-            {% for i in api_response %}
-                    <tr>
-                        <td style="border-bottom:3px solid black" align="center"> {{ i['items']['data'][0]['plan']['id'] }} </td>
-                        <td style="border-bottom:3px solid black" align="center" class="donation-amount"> ${{ i['items']['data'][0]['plan']['amount'] / 100 }} </td>
-                        <td style="border-bottom:3px solid black" align="center"> {{ i['items']['data'][0]['plan']['interval'] }} </td>
-                    </tr>
-
-            {% endfor %}
+                {% for i in api_response %}
+                        <tr>
+                            <td style="border-bottom:3px solid black" align="center"> {{ i['items']['data'][0]['plan']['nickname'] }} </td>
+                            <td style="border-bottom:3px solid black" align="center" class="donation-amount"> ${{ i['items']['data'][0]['plan']['amount'] / 100 }} </td>
+                            <td style="border-bottom:3px solid black" align="center"> {{ i['items']['data'][0]['plan']['interval'] }} </td>
+                            <td style="border-bottom:3px solid black" align="center" name="delete">
+                                <form action="/deletedonator" method="post">
+                                    <input type="hidden" name="subscriptionId" value="{{ i['items']['data'][0]['subscription'] }}">
+                                    <input type="hidden" name="planId" value="{{ i['items']['data'][0]['plan']['id'] }}">
+                                    <input type="hidden" name="productId" value="{{ i['items']['data'][0]['plan']['product'] }}">
+                                    <input type="hidden" name="customerId" value="{{ i['customer'] }}">
+                                    <input type="submit" value="DELETE" class="btn btn-success btn-xs btn-block" role="button">
+                                </form>
+                            </td>
+                        </tr>
+                {% endfor %}
             </tbody>
         </table>
     </div>

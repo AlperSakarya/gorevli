@@ -93,4 +93,4 @@ def get_members(conn):
 def delete_comm_member(conn, email):
     cur = conn.cursor()
     cur.execute(('DELETE FROM members WHERE email=?'), (email,))
-    #return cur.lastrowid
+

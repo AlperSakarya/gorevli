@@ -13,7 +13,7 @@
 
         {% if e %}
 
-            <span class="label label-danger">Success</span><br>
+            <span class="label label-danger">Error</span><br>
             <div class="alert alert-danger" role="alert">{{ e }}</div><p>
 
         {% endif %}
@@ -39,13 +39,12 @@
         {% if api_response %}
             {% for member in api_response %}
                 <tr>
-                    <td style="border-bottom:3px solid black" align="center"> {{ member[2]}} </td>
+                    <td style="border-bottom:3px solid black" align="center"> {{ member[2] }} </td>
                     <td style="border-bottom:3px solid black" align="center"> {{ member[3] }} </td>
-                    <td style="border-bottom:3px solid black" align="center">
-                                    <form action="/deletemember" method="post">
-                                        <input type="hidden" name="email" value="{{ member[4] }}"> {{ member[4] }}
-                    </td>
+                    <td style="border-bottom:3px solid black" align="center"> {{ member[4] }} </td>
                     <td style="border-bottom:3px solid black" name="delete" align="center">
+                        <form action="/deletemember" method="post">
+                            <input type="hidden" name="email" value="{{ member[4] }}">
                         <input type="submit" value="DELETE" class="btn btn-success btn-xs btn-block" role="button">
                         </form>
                     </td>

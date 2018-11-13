@@ -141,8 +141,13 @@ def iletisim_paneli():
 def aidat_paneli():
     try:
         api_response = stripe.Subscription.list(limit=100)
+        total = 0
+        for i in api_response:
+            amount = i['items']['data'][0]['plan']['amount']
+            total = total + amount / 100
+
         return render_template('aidat-paneli.html', api_response=api_response,
-                               registered_members=len(api_response.data))
+                               registered_members=len(api_response.data), total=total)
     except Exception as e:
         # username=flask_login.current_user.id We can show which user logged in to the panel by sending this to html
         return render_template('login-response.html', exception_message="Hata olustu", e=e)
@@ -161,6 +166,36 @@ def delete_member():
         else:
             member_count = len(members)
         return render_template('iletisim-paneli.html', api_response=members, registered_members=member_count)
+
+
+@app.route('/deletedonator', methods=['POST'])
+@flask_login.login_required
+def delete_donator():
+    subscription_id = request.form['subscriptionId']
+    plan_id = request.form['planId']
+    product_id = request.form['productId']
+    customer_id = request.form['customerId']
+    try:
+        sub = stripe.Subscription.retrieve(subscription_id)
+        sub.delete()
+        plan = stripe.Plan.retrieve(plan_id)
+        plan.delete()
+        prod = stripe.Product.retrieve(product_id)
+        prod.delete()
+        cust = stripe.Customer.retrieve(customer_id)
+        cust.delete()
+        time.sleep(1)
+        api_response = stripe.Subscription.list(limit=100)
+        total = 0
+        for i in api_response:
+            amount = i['items']['data'][0]['plan']['amount']
+            total = total + amount / 100
+        success_message = "Recurring donation was removed..."
+        return render_template('aidat-paneli.html', api_response=api_response,
+                               registered_members=len(api_response.data), total=total, success_message=success_message)
+    except Exception as e:
+        return render_template('aidat-paneli.html', api_response=api_response,
+                               registered_members=len(api_response.data), total=total, e=e)
 
 
 @app.route('/send-sms', methods=['POST'])
@@ -256,17 +291,20 @@ def charge():
 
         return render_template('donate-response.html', amount=amount)
 
-    else:  # This means user does want recurring payments, processing them.
+    else:  # This means user wants recurring payments, processing them.
         try:
             try:  # Creating a new Stripe plan named with user's email address
-                plan_id = request.form['email']
                 plan = stripe.Plan.create(
-                    name="Monthly Donation",
-                    id=request.form['email'],
+                    amount=amount,
                     interval="month",
-                    currency="usd",
-                    amount=amount
+                    product={
+                        "name": "Monthly Donation"
+                    },
+                    nickname=request.form['email'],
+                    currency="usd"
+
                 )
+                plan_id = plan['id']
             except stripe.InvalidRequestError as e:
                 return render_template('donate-response.html', exception_message="Hata olustu", e=e)
                 pass
