@@ -162,22 +162,6 @@ def aidat_paneli():
                            registered_members=len(api_response), total=total)
 
 
-'''
-    try:
-        api_response = stripe.Subscription.list(limit=100)
-        total = 0
-        for i in api_response:
-            amount = i['items']['data'][0]['plan']['amount']
-            total = total + amount / 100
-
-        return render_template('aidat-paneli.html', api_response=api_response,
-                               registered_members=len(api_response.data), total=total)
-    except Exception as e:
-        # username=flask_login.current_user.id We can show which user logged in to the panel by sending this to html
-        return render_template('login-response.html', exception_message="Hata olustu", e=e)
-'''
-
-
 @app.route('/getdonators', methods=['POST'])
 @flask_login.login_required
 def get_donators():
@@ -190,6 +174,21 @@ def get_donators():
             amount = i['items']['data'][0]['plan']['amount']
             total = total + amount
         my_data = {'registered_members': len(api_response), 'total_amount': total / 100}
+        json_data = json.dumps(my_data)
+        return json_data
+    except Exception as e:
+        print("EXCEPTION!!!", e)
+        return e
+
+
+@app.route('/get_donating_members', methods=['POST'])
+@flask_login.login_required
+def get_donating_members():
+    try:
+        state = request.form['state']
+        generate_stripe_keys(state)
+        api_response = stripe.Subscription.list(limit=100)
+        my_data = {'registered_members': len(api_response)}
         json_data = json.dumps(my_data)
         return json_data
     except Exception as e:

@@ -3,7 +3,7 @@
 
 <div class="container">
 
-    <p><h2 class="form-signin-heading" align="center">Aylik Aidat Listesi</h2></p>
+    <p><h2 class="form-signin-heading" align="center">Recurring Monthly Donations</h2></p>
 
         {% if success_message %}
             <div class="alert alert-success" role="alert"><span class="label label-success">Success</span> {{ success_message }}</div><p>
@@ -24,14 +24,11 @@
           data:{"state":state}
         }).done(function(data) {
             var result = JSON.parse(data);
-            console.log(result)
             document.getElementById("dcPayingMembers").innerHTML = result.registered_members ;
             document.getElementById("dcTotalAmount").innerHTML =  "$" + result.total_amount;
         });
       });
     });
-</script>
-<script type=text/javascript>
     $(function() {
       $('a#dc').bind('click', function() {
           var state = "dc";
@@ -41,27 +38,25 @@
           data:{"state":state}
         }).done(function(data) {
             var result = JSON.parse(data);
-            console.log(result)
             document.getElementById("dcPayingMembers").innerHTML = result.registered_members ;
             document.getElementById("dcTotalAmount").innerHTML =  "$" + result.total_amount;
         });
       });
     });
+
+
 </script>
 
-
-
   <a id="dc" class="btn btn-success" data-toggle="collapse" href="#dcVakfi" role="button" aria-expanded="false" aria-controls="dcVakfi">
-    D.C Vakfi
-  </a>
+    D.C Branch </a>
   <a id="nj" class="btn btn-success" data-toggle="collapse" href="#njVakfi" role="button" aria-expanded="false" aria-controls="njVakfi">
-    N.J Vakfi
-  </a>
+    N.J Branch </a><p>
 
 <div class="collapse" id="dcVakfi">
   <div class="card card-body">
     <p align="center">Total Paying Members: <strong id="dcPayingMembers">{{ registered_members }}</strong><b></b></p>
     <p id="total-amount" align="center">Total Monthly Recurring: <strong id="dcTotalAmount">${{ total }}</strong><b></b></p>
+    <div> <a href="/gorevlipaneli" class="shadow btn btn-success">SHOW MEMBERS</a> </div>
     {% if registered_members > 0 %}
     <div>
         <table class="table table-striped" id="donating-members">
@@ -99,6 +94,7 @@
   <div class="card card-body">
     <p align="center">Total Paying Members: <strong>{{ registered_members }}</strong><b></b></p>
     <p align="center">Total Monthly Recurring: <strong>${{ total }}</strong><b></b></p>
+    <div> <a href="/gorevlipaneli" class="shadow btn btn-success">SHOW MEMBERS</a> </div>
     {% if registered_members > 0 %}
     <div>
         <table class="table table-striped" id="donating-members">
@@ -132,11 +128,8 @@
     {% endif %}
   </div>
 </div>
-
-
     <div>
-        <a href="/gorevlipaneli" class="shadow btn btn-success btn-lg btn-block">GERI</a>
+        <a href="/gorevlipaneli" class="shadow btn btn-success btn-lg btn-block">BACK</a>
     </div>
-</div>
 
 {% endblock %}
