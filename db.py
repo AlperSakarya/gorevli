@@ -11,7 +11,7 @@ def check_create_db():
         os.makedirs(data_path)
     db = sqlite3.connect(data_path + filename + '.sqlite3')
     db.execute('CREATE TABLE IF NOT EXISTS members (id INTEGER PRIMARY KEY, cus_id VARCHAR, name VARCHAR, '
-               'phone INT, email VARCHAR UNIQUE)')
+               'phone INT, email VARCHAR UNIQUE, state VARCHAR)')
     db.close()
 
 
@@ -29,7 +29,7 @@ def create_connection(db_file):
 # SQL query to check if the unique user email exist in the DB or not
 def select_all_members(conn, member_email):
     cur = conn.cursor()
-    cur.execute(('SELECT * FROM members WHERE email=?'), (member_email,))
+    cur.execute(('SELECT * FROM members WHERE email=? and cus_id is not NULL '), (member_email,))
     rows = cur.fetchall()
     if len(rows) == 0:
         return False
@@ -39,7 +39,7 @@ def select_all_members(conn, member_email):
 
 # DB query to save the newly created Stripe customer ID in to the DB for future charges so that charges can be tracked
 def cus_id_save(conn, members):
-    sql = ''' INSERT INTO members(cus_id, name, phone, email) VALUES (?, ?, ?, ?)'''
+    sql = ''' INSERT INTO members(cus_id, name, phone, email, state) VALUES (?, ?, ?, ?, ?)'''
     cur = conn.cursor()
     cur.execute(sql, members)
     return cur.lastrowid
@@ -47,7 +47,7 @@ def cus_id_save(conn, members):
 
 # SQL query to save a new member in to the newsletter table
 def cus_comm_save(conn, members):
-    sql = ''' INSERT INTO members(name, phone, email) VALUES (?, ?, ?)'''
+    sql = ''' INSERT INTO members(name, phone, email, state) VALUES (?, ?, ?, ?)'''
     cur = conn.cursor()
     cur.execute(sql, members)
     return cur.lastrowid

@@ -1,25 +1,39 @@
 #!/usr/bin/env python
 from __future__ import print_function
 import flask, flask_login
-from flask import Flask, render_template, url_for, request
+from flask import Flask, render_template, url_for, request, json
 from forms import signupform, donationform, LoginForm, SmsForm
 import stripe
-import uuid, json, unirest, re, time, datetime
+import uuid, json, unirest, re, time, datetime, jsonify
 import auth  # I pass my access tokens here and import this auth.py file
 from auth import client, auth_token, account_sid, location_id, from_number, access_token,\
-    STRIPE_PUBLISHABLE_KEY, STRIPE_SECRET_KEY, users
+    STRIPE_PUBLISHABLE_KEY_NJ, STRIPE_SECRET_KEY_NJ, STRIPE_PUBLISHABLE_KEY_DC, STRIPE_SECRET_KEY_DC, users
 from db import *
 
 # Setting Global Variables
 app = Flask(__name__)
 app = flask.Flask(__name__)
 app.secret_key = 'myverylongsecretkey' #  Change this in your production
-stripe_keys = {'secret_key': STRIPE_SECRET_KEY, 'publishable_key': STRIPE_PUBLISHABLE_KEY}  # Define this in auth.py
+stripe_keys = {'secret_key': STRIPE_SECRET_KEY_NJ, 'publishable_key': STRIPE_PUBLISHABLE_KEY_NJ}  # Define this in auth.py
 stripe.api_key = stripe_keys['secret_key']  # Define this in auth.py. It's in your Stripe dashboard
 database = "./database/member-db.sqlite3"  # This is where the DB gets put. Configured in db.py
 check_create_db()  # Check and/or create the member database if does not exist. If exist will not overwrite
 login_manager = flask_login.LoginManager()  # Flask login parameters
 login_manager.init_app(app)  # Flask login parameters
+
+
+def generate_stripe_keys(state):
+    if state == "nj":
+        stripe_keys = {'secret_key': STRIPE_SECRET_KEY_NJ,
+                       'publishable_key': STRIPE_PUBLISHABLE_KEY_NJ}  # Define this in auth.py
+        stripe.api_key = stripe_keys['secret_key']
+        return stripe_keys, stripe.api_key
+
+    if state == "dc":
+        stripe_keys = {'secret_key': STRIPE_SECRET_KEY_DC,
+                       'publishable_key': STRIPE_PUBLISHABLE_KEY_DC}  # Define this in auth.py
+        stripe.api_key = stripe_keys['secret_key']
+        return stripe_keys, stripe.api_key
 
 
 class User(flask_login.UserMixin):
@@ -81,21 +95,24 @@ def signuprequest():
 
                     try:
                         # ADD new info to local DB
-                        member = (form.memberName.data, form.phoneNumber.data, form.notificationEmail.data)
+                        member = (form.memberName.data, form.phoneNumber.data, form.notificationEmail.data,
+                                  form.location.data)
                         cus_comm_save(conn, member)
 
                     except Exception as e:
                         return render_template('donate-response.html', exception_message="Hata olustu", e=e)
 
                 else:
-                    member = (form.memberName.data, form.phoneNumber.data, form.notificationEmail.data)
+                    member = (form.memberName.data, form.phoneNumber.data, form.notificationEmail.data,
+                              form.location.data)
                     cus_name_phone_save(conn, member)
 
             else:
                 return render_template('signup-response.html', exception="Email Mecburi")
 
             return render_template('signup-response.html', exception="", isim=form.memberName.data,
-                                   email=form.notificationEmail.data, telefon=form.phoneNumber.data)
+                                   email=form.notificationEmail.data, telefon=form.phoneNumber.data,
+                                   vakif=form.location.data)
 
         except Exception as e:
             return render_template('signup-response.html', exception=e.body)
@@ -139,6 +156,13 @@ def iletisim_paneli():
 @app.route('/aidatpaneli')
 @flask_login.login_required
 def aidat_paneli():
+    api_response = ""
+    total = 0
+    return render_template('aidat-paneli.html', api_response=api_response,
+                           registered_members=len(api_response), total=total)
+
+
+'''
     try:
         api_response = stripe.Subscription.list(limit=100)
         total = 0
@@ -151,6 +175,26 @@ def aidat_paneli():
     except Exception as e:
         # username=flask_login.current_user.id We can show which user logged in to the panel by sending this to html
         return render_template('login-response.html', exception_message="Hata olustu", e=e)
+'''
+
+
+@app.route('/getdonators', methods=['POST'])
+@flask_login.login_required
+def get_donators():
+    try:
+        state = request.form['state']
+        generate_stripe_keys(state)
+        api_response = stripe.Subscription.list(limit=100)
+        total = 0
+        for i in api_response['data']:
+            amount = i['items']['data'][0]['plan']['amount']
+            total = total + amount
+        my_data = {'registered_members': len(api_response), 'total_amount': total / 100}
+        json_data = json.dumps(my_data)
+        return json_data
+    except Exception as e:
+        print("EXCEPTION!!!", e)
+        return e
 
 
 @app.route('/deletemember', methods=['POST'])
@@ -200,12 +244,15 @@ def delete_donator():
 
 @app.route('/send-sms', methods=['POST'])
 def send_sms_message():
-    # List customers from local DB and SMS with twilio
+    # List customers from local DB and SMS with Twilio
     # Setting from number for members
     form = SmsForm()
     sms_message = form.sms_content.data
+    location = form.location.data
     registered_members = 0
+    members = 0
     conn = create_connection(database)
+
     with conn:
         try:
             members = get_members(conn)
@@ -215,19 +262,21 @@ def send_sms_message():
                 message = client.api.account.messages.create(to=number, from_=from_number, body=sms_message)
                 registered_members += 1
                 time.sleep(1)
-
         except:
             e = "There was a problem, most likely an invalid number in the member list"
             return render_template('iletisim-paneli.html', api_response=members, exception=e,
                                    success_message="SMS was sent to all members!", registered_members=registered_members)
 
     return render_template('iletisim-paneli.html', api_response=members,
-                           success_message="SMS was sent to all members!", registered_members=registered_members)
+                       success_message="SMS was sent to all members!", registered_members=registered_members)
 
 
 @app.route('/charge', methods=['POST'])
 def charge():
     amount = int(request.form['amount']) * 100  # Converting to cents to dollars
+    location = request.form['location']
+    generate_stripe_keys(location)
+
     if str(request.form['recurring']) == "no":  # Checking if user wants to subscribe to monthly donations
 
         try:
@@ -256,7 +305,8 @@ def charge():
 
                         # ADD new info to local DB
 
-                        member = (customer.id, request.form['name'], request.form['phone'], request.form['email'])
+                        member = (customer.id, request.form['name'], request.form['phone'], request.form['email'],
+                                  request.form['location'])
                         cus_id_save(conn, member)
 
                     except Exception as e:
@@ -292,6 +342,7 @@ def charge():
         return render_template('donate-response.html', amount=amount)
 
     else:  # This means user wants recurring payments, processing them.
+        #### RECURRING PAYMENTS ####
         try:
             try:  # Creating a new Stripe plan named with user's email address
                 plan = stripe.Plan.create(
@@ -316,8 +367,18 @@ def charge():
                     # the credit card under their cus_ID and then charge the customer
                     existing_stripe_id = (select_all_members(conn, request.form['email']))
 
-                    if existing_stripe_id is False:
+                    if existing_stripe_id:
 
+                        # Else grab their cus_ID and make plan association to this cus_ID
+                        subscribe = stripe.Subscription.create(
+                            customer=existing_stripe_id,
+                            items=[
+                                {
+                                    "plan": plan_id,
+                                },
+                            ]
+                        )
+                    else:
                         try:
                             # Customer does not exist in local DB create one in Stripe
                             customer = stripe.Customer.create(
@@ -335,23 +396,12 @@ def charge():
                                 ]
                             )
 
-                            # ADD new customer to local DB
-                            member = (customer.id, request.form['name'], request.form['phone'], request.form['email'])
-                            cus_id_save(conn, member)
+                            # ADD new customer's stripe ID to local DB
+                            member = (customer.id, request.form['email'])
+                            cus_id_add(conn, member)
 
                         except Exception as e:
                             return render_template('donate-response.html', exception_message="Hata olustu", e=e)
-
-                    else:
-                        # Else grab their cus_ID and make plan association to this cus_ID
-                        subscribe = stripe.Subscription.create(
-                            customer=existing_stripe_id,
-                            items=[
-                                {
-                                    "plan": plan_id,
-                                },
-                            ]
-                        )
 
             except stripe.InvalidRequestError as e:
                 return render_template('donate-response.html', exception_message="Hata olustu", e=e)

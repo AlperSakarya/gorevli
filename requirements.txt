@@ -1,4 +1,5 @@
 flask_login
+jsonify
 flask_wtf
 stripe
 unirest

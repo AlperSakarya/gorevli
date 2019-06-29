@@ -1,6 +1,7 @@
 {% extends "layout.html" %}
 {% block content %}
 
+
 <div class="container">
                 
 	<form class="form-signin" action="signuprequest" method="post">
@@ -15,8 +16,17 @@
 		<p><label for="notificationEmail" class="sr-only">Email:</label> 
                 <input type="email" name="notificationEmail" class="form-control" placeholder="Email Address" required autofocus/></p>
 
-        <input type="submit" value="Uye Kaydet" class="btn btn-success btn-lg btn-block" role="button">
-        <a href="/" class="btn btn-success btn-lg btn-block">GERI</a>
+            <div class="input-group mb-3">
+              <div class="input-group-prepend">
+                <label class="input-group-text" for="inputGroupSelect01">Vakif</label>
+              </div>
+              <select name="location" class="custom-select" id="inputGroupSelect01">
+                  <option value="dc" selected>Washington D.C</option>
+                  <option value="nj">New Jersey</option>
+              </select>
+            </div>
+        <input type="submit" value="Uye Kaydet" class="shadow btn btn-success btn-lg btn-block" role="button">
+        <a href="/" class="shadow btn btn-success btn-lg btn-block">GERI</a>
 	</form>
 </div>
 

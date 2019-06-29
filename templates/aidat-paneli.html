@@ -14,12 +14,58 @@
             <div class="alert alert-danger" role="alert">{{ e }}</div><p>
         {% endif %}
 
+<script type=text/javascript>
+    $(function() {
+      $('a#nj').bind('click', function() {
+          var state = "nj";
+         $.ajax({
+          url: "/getdonators",
+          type: "POST",
+          data:{"state":state}
+        }).done(function(data) {
+            var result = JSON.parse(data);
+            console.log(result)
+            document.getElementById("dcPayingMembers").innerHTML = result.registered_members ;
+            document.getElementById("dcTotalAmount").innerHTML =  "$" + result.total_amount;
+        });
+      });
+    });
+</script>
+<script type=text/javascript>
+    $(function() {
+      $('a#dc').bind('click', function() {
+          var state = "dc";
+         $.ajax({
+          url: "/getdonators",
+          type: "POST",
+          data:{"state":state}
+        }).done(function(data) {
+            var result = JSON.parse(data);
+            console.log(result)
+            document.getElementById("dcPayingMembers").innerHTML = result.registered_members ;
+            document.getElementById("dcTotalAmount").innerHTML =  "$" + result.total_amount;
+        });
+      });
+    });
+</script>
 
-    <p align="center">Total Paying Members: <strong>{{ registered_members }}</strong><b></b></p>
-    <p align="center">Total Monthly Recurring: <strong>${{ total }}</strong><b></b></p>
+
+
+  <a id="dc" class="btn btn-success" data-toggle="collapse" href="#dcVakfi" role="button" aria-expanded="false" aria-controls="dcVakfi">
+    D.C Vakfi
+  </a>
+  <a id="nj" class="btn btn-success" data-toggle="collapse" href="#njVakfi" role="button" aria-expanded="false" aria-controls="njVakfi">
+    N.J Vakfi
+  </a>
+
+<div class="collapse" id="dcVakfi">
+  <div class="card card-body">
+    <p align="center">Total Paying Members: <strong id="dcPayingMembers">{{ registered_members }}</strong><b></b></p>
+    <p id="total-amount" align="center">Total Monthly Recurring: <strong id="dcTotalAmount">${{ total }}</strong><b></b></p>
+    {% if registered_members > 0 %}
     <div>
-        <table border="1px" align="center" id="donating-members">
-            <thead>
+        <table class="table table-striped" id="donating-members">
+            <thead class="thead-light">
                 <th><div align="center"> NAME </div></th>
                 <th><div align="center"> AMOUNT </div></th>
                 <th><div align="center"> INTERVAL </div></th>
@@ -28,16 +74,16 @@
             <tbody>
                 {% for i in api_response %}
                         <tr>
-                            <td style="border-bottom:3px solid black" align="center"> {{ i['items']['data'][0]['plan']['nickname'] }} </td>
-                            <td style="border-bottom:3px solid black" align="center" class="donation-amount"> ${{ i['items']['data'][0]['plan']['amount'] / 100 }} </td>
-                            <td style="border-bottom:3px solid black" align="center"> {{ i['items']['data'][0]['plan']['interval'] }} </td>
-                            <td style="border-bottom:3px solid black" align="center" name="delete">
+                            <td> {{ i['items']['data'][0]['plan']['nickname'] }} </td>
+                            <td class="donation-amount"> ${{ i['items']['data'][0]['plan']['amount'] / 100 }} </td>
+                            <td> {{ i['items']['data'][0]['plan']['interval'] }} </td>
+                            <td name="delete">
                                 <form action="/deletedonator" method="post">
                                     <input type="hidden" name="subscriptionId" value="{{ i['items']['data'][0]['subscription'] }}">
                                     <input type="hidden" name="planId" value="{{ i['items']['data'][0]['plan']['id'] }}">
                                     <input type="hidden" name="productId" value="{{ i['items']['data'][0]['plan']['product'] }}">
                                     <input type="hidden" name="customerId" value="{{ i['customer'] }}">
-                                    <input type="submit" value="DELETE" class="btn btn-success btn-xs btn-block" role="button">
+                                    <input type="submit" value="DELETE" class="shadow btn btn-success btn-xs btn-block" role="button">
                                 </form>
                             </td>
                         </tr>
@@ -45,10 +91,51 @@
             </tbody>
         </table>
     </div>
+    {% endif %}
+  </div>
+</div>
 
-    <br>
+<div class="collapse" id="njVakfi">
+  <div class="card card-body">
+    <p align="center">Total Paying Members: <strong>{{ registered_members }}</strong><b></b></p>
+    <p align="center">Total Monthly Recurring: <strong>${{ total }}</strong><b></b></p>
+    {% if registered_members > 0 %}
     <div>
-        <a href="/gorevlipaneli" class="btn btn-success btn-lg btn-block">GERI</a>
+        <table class="table table-striped" id="donating-members">
+            <thead class="thead-light">
+                <th><div align="center"> NAME </div></th>
+                <th><div align="center"> AMOUNT </div></th>
+                <th><div align="center"> INTERVAL </div></th>
+                <th><div align="center"> DELETE </div></th>
+            </thead>
+            <tbody>
+
+                {% for i in api_response %}
+                        <tr>
+                            <td> {{ i['items']['data'][0]['plan']['nickname'] }} </td>
+                            <td class="donation-amount"> ${{ i['items']['data'][0]['plan']['amount'] / 100 }} </td>
+                            <td> {{ i['items']['data'][0]['plan']['interval'] }} </td>
+                            <td name="delete">
+                                <form action="/deletedonator" method="post">
+                                    <input type="hidden" name="subscriptionId" value="{{ i['items']['data'][0]['subscription'] }}">
+                                    <input type="hidden" name="planId" value="{{ i['items']['data'][0]['plan']['id'] }}">
+                                    <input type="hidden" name="productId" value="{{ i['items']['data'][0]['plan']['product'] }}">
+                                    <input type="hidden" name="customerId" value="{{ i['customer'] }}">
+                                    <input type="submit" value="DELETE" class="shadow btn btn-success btn-xs btn-block" role="button">
+                                </form>
+                            </td>
+                        </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% endif %}
+  </div>
+</div>
+
+
+    <div>
+        <a href="/gorevlipaneli" class="shadow btn btn-success btn-lg btn-block">GERI</a>
     </div>
 </div>
 

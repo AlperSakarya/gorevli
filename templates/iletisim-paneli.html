@@ -3,61 +3,67 @@
 
 <div class="container">
 
-    <form  action="send-sms" method="post">
-
         {% if success_message %}
-
             <div class="alert alert-success" role="alert"><span class="label label-success">Success</span> {{ success_message }}</div><p>
-
         {% endif %}
-
         {% if e %}
-
             <span class="label label-danger">Error</span><br>
             <div class="alert alert-danger" role="alert">{{ e }}</div><p>
-
         {% endif %}
 
-            <h2 class="form-signin-heading">SMS Message:</h2>
-            <input type="text" name="sms_content" class="form-control" placeholder="Enter SMS message here!"
-                            required autofocus/><br><p>
-            <input type="submit" value="SEND SMS" class="btn btn-success btn-lg btn-block" role="button">
+    <form action="send-sms" method="post">
+        <h2 class="form-signin-heading">SMS Message:</h2>
+        <input type="text" name="sms_content" class="form-control" placeholder="Enter SMS message here!"
+                        required autofocus/><br><p>
+        <div class="input-group mb-3">
+            <div class="input-group-prepend">
+                <button class="btn btn-success btn-block " type="submit">SEND SMS</button>
+            </div>
+            <select name="location" class="custom-select" id="inputGroupSelect03" aria-label="Example select with button addon" required>
+                <option value="" selected>SMS Atilacak Vakfi Sec...</option>
+                <option value="dc">Washington D.C Vakfi</option>
+                <option value="nj">New Jersey Vakfi</option>
+            </select>
+        </div>
     </form>
-
     <p><h2 class="form-signin-heading" align="center">Current Members</h2></p>
-
     <p align="center">Total Registered Members: <b>{{ registered_members }}</b></p>
+    {% if registered_members > 0 %}
     <div>
-        <table border="1px" align="center">
+        <table class="table table-striped">
+         <thead class="thead-light">
             <tr>
                 <th><div align="center"> NAME </div></th>
                 <th><div align="center"> PHONE </div></th>
                 <th><div align="center"> EMAIL </div></th>
+                <th><div align="center"> STATE  </div></th>
                 <th><div align="center"> DELETE </div></th>
             </tr>
-
+         </thead>
         {% if api_response %}
+            <tbody>
             {% for member in api_response %}
                 <tr>
-                    <td style="border-bottom:3px solid black" align="center"> {{ member[2] }} </td>
-                    <td style="border-bottom:3px solid black" align="center"> {{ member[3] }} </td>
-                    <td style="border-bottom:3px solid black" align="center"> {{ member[4] }} </td>
-                    <td style="border-bottom:3px solid black" name="delete" align="center">
+                    <td> {{ member[2] }} </td>
+                    <td> {{ member[3] }} </td>
+                    <td> {{ member[4] }} </td>
+                    <td> {% if member[5] =="nj" %} NJ {% elif member[5] == "dc" %} DC {% endif %}</td>
+                    <td name="delete">
                         <form action="/deletemember" method="post">
                             <input type="hidden" name="email" value="{{ member[4] }}">
-                        <input type="submit" value="DELETE" class="btn btn-success btn-xs btn-block" role="button">
+                        <input type="submit" value="DELETE" class="shadow btn btn-success btn-xs btn-block" role="button">
                         </form>
                     </td>
                 </tr>
             {% endfor %}
+            </tbody>
         {% endif %}
         </table>
     </div>
-    <br>
+    {% endif %}
     <div>
-        <a href="/gorevlipaneli" class="btn btn-success btn-lg btn-block">GERI</a>
+        <a href="/gorevlipaneli" class="shadow btn btn-success btn-lg btn-block">GERI</a>
     </div>
-
 </div>
 
 {% endblock %}

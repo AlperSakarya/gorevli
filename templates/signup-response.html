@@ -7,10 +7,11 @@
 
             {% if exception == "" %}
                 <h1 class="display-3">Tesekkurler!</h1>
-                <p class="lead">Sistemimize basariyla uye oldunuz! Artik bizden SMS ve Email alabilirsiniz.</p>
+                <p class="lead">Sistemimize basariyla uye oldunuz!<br>Artik bizden SMS ve Email alabilirsiniz.</p>
                     Isim: {{ isim }}<br>
                     Telefon: {{ telefon }}<br>
                     Email: {{ email }}<br><p>
+                    Vakif: {% if vakif == "dc" %} Washington D.C {% elif vakif == "nj" %} New Jersey {% endif %}<br><p>
                 <p><a class="btn btn-lg btn-success" href="/" role="button">Geri Don / Yeni Uye</a></p>
 
             {%else%}
