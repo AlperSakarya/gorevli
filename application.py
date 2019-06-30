@@ -181,15 +181,26 @@ def get_donators():
         return e
 
 
-@app.route('/get_donating_members', methods=['POST'])
+@app.route('/getdonatingmembers', methods=['POST'])
 @flask_login.login_required
 def get_donating_members():
     try:
         state = request.form['state']
         generate_stripe_keys(state)
         api_response = stripe.Subscription.list(limit=100)
-        my_data = {'registered_members': len(api_response)}
-        json_data = json.dumps(my_data)
+        sum_response = []
+        donators = {}
+        for i in api_response['data']:
+            email = i['items']['data'][0]['plan']['nickname']
+            amount = i['items']['data'][0]['plan']['amount']
+            created = i['items']['data'][0]['plan']['created']
+            interval = i['items']['data'][0]['plan']['interval']
+            donators["email"] = email
+            donators["amount"] = amount / 100
+            donators["interval"] = interval
+            donators["created"] = created
+            sum_response.append(json.dumps(donators))
+        json_data = json.dumps(sum_response)
         return json_data
     except Exception as e:
         print("EXCEPTION!!!", e)
