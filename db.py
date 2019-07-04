@@ -62,6 +62,11 @@ def dynamo_get_members():
     return response
 
 
+# SQL query to delete selected member from the SMS DB
+def dynamo_delete_comm_member(email):
+    response = table.delete_item(
+        Key={'email': email}
+    )
 
 #######################################################
 

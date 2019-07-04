@@ -41,6 +41,7 @@
             </tr>
          </thead>
         {% if api_response %}
+            {{ api_response }}
             <tbody>
             {% for member in api_response %}
                 <tr>
@@ -50,7 +51,7 @@
                     <td>{% if member['state'] =="nj" %} NJ {% elif member['state'] == "dc" %} DC {% endif %}</td>
                     <td name="delete">
                         <form action="/deletemember" method="post">
-                            <input type="hidden" name="email" value="{{ member[4] }}">
+                            <input type="hidden" name="email" value="{{ member['email'] }}">
                         <input type="submit" value="DELETE" class="shadow btn btn-success btn-xs btn-block" role="button">
                         </form>
                     </td>

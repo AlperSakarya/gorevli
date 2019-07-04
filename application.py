@@ -142,15 +142,12 @@ def iletisim_paneli():
     try:
         conn = create_connection(database)
         with conn:
-            #members = get_members(conn)
             members = dynamo_get_members()
             if not members:
-            #if members is False:
                 member_count = 0
             else:
                 member_count = members['Count']
                 member_list = members['Items']
-                print(member_list)
             return render_template('iletisim-paneli.html', api_response=member_list, registered_members=member_count)
 
     except Exception as e:
@@ -214,16 +211,22 @@ def get_donating_members():
 @app.route('/deletemember', methods=['POST'])
 @flask_login.login_required
 def delete_member():
-    conn = create_connection(database)
-    with conn:
+    e = ""
+    members = ""
+    member_count = ""
+    try:
         email = request.form['email']
-        delete_comm_member(conn, email)
-        members = get_members(conn)
-        if members is False:
+        dynamo_delete_comm_member(email)
+        members = dynamo_get_members()
+        print(members)
+        if not members:
             member_count = 0
         else:
-            member_count = len(members)
-        return render_template('iletisim-paneli.html', api_response=members, registered_members=member_count)
+            member_count = members['Count']
+    except Exception as e:
+        print(e)
+
+    return render_template('iletisim-paneli.html', api_response=members, registered_members=member_count, e=e)
 
 
 @app.route('/deletedonator', methods=['POST'])
