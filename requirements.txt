@@ -10,3 +10,4 @@ click
 MarkupSafe
 Jinja2
 Flask
+boto3

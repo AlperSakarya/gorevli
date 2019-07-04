@@ -1,6 +1,72 @@
 import os
 import sqlite3
 from sqlite3 import Error
+import boto3
+from boto3.dynamodb.conditions import Key, Attr
+from auth import AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY
+
+# Creating DynamoDB table as a resource
+dynamodb = boto3.resource('dynamodb', aws_access_key_id=AWS_ACCESS_KEY_ID, aws_secret_access_key=AWS_SECRET_ACCESS_KEY)
+table = dynamodb.Table('gorevli') # Pass your Dynamo table name here
+
+
+# DB Functions will be listed here. Moving local mysqli file to Dynamo
+# SQL query to save a new member in to the newsletter table
+
+
+def dynamo_cus_comm_save(members):
+    table.put_item(
+        Item={
+            'name': members[0],
+            'phone': members[1],
+            'email': members[2],
+            'state': members[3]
+        }
+    )
+
+
+def dynamo_select_all_members(member_email):
+    response = table.query(
+        KeyConditionExpression=Key('email').eq(member_email)
+    )
+    items = response['Items']
+    if not items:
+        result = False
+    else:
+        result = True
+    return result
+
+
+# SQL query to save new newsletter signup into existing donating customer's row
+def dynamo_cus_name_phone_save(members):
+    response = table.update_item(
+        Key={
+            'email': members[2]
+        },
+        UpdateExpression='set #nm = :val1, phone = :val2, #st = :val3',
+        ExpressionAttributeValues={
+            ':val1': (members[0]),
+            ':val2': (members[1]),
+            ':val3': (members[3])
+        },
+        ExpressionAttributeNames={
+            "#nm": "name",
+            "#st": "state"
+            }
+    )
+
+
+# SQL query to pull all the members to display in SMS panel
+def dynamo_get_members():
+    response = table.scan()
+    return response
+
+
+
+#######################################################
+
+
+# OLD mysqli DB FUNCTIONS
 
 
 # Initial DB check/create statement. Creates the DB if it's not there. If exist does not touch.

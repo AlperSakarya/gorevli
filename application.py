@@ -7,7 +7,8 @@ import stripe
 import uuid, json, unirest, re, time, datetime, jsonify
 import auth  # I pass my access tokens here and import this auth.py file
 from auth import client, auth_token, account_sid, location_id, from_number, access_token,\
-    STRIPE_PUBLISHABLE_KEY_NJ, STRIPE_SECRET_KEY_NJ, STRIPE_PUBLISHABLE_KEY_DC, STRIPE_SECRET_KEY_DC, users
+    STRIPE_PUBLISHABLE_KEY_NJ, STRIPE_SECRET_KEY_NJ, STRIPE_PUBLISHABLE_KEY_DC, STRIPE_SECRET_KEY_DC, \
+    users
 from db import *
 
 # Setting Global Variables
@@ -84,38 +85,37 @@ def admin_login_page():
 @app.route('/signuprequest', methods=['POST'])
 def signuprequest():
     form = signupform()
-    conn = create_connection(database)
-    with conn:
-        try:
-            if form.notificationEmail.data != "":
-                # Query all customers to check for existing email or phone if we do have a match, we will add
-                # the credit card under their cus_ID and then charge the customer
-                existing_stripe_id = (select_all_members(conn, form.notificationEmail.data))
-                if existing_stripe_id is False:
+    try:
+        if form.notificationEmail.data != "":
+            # Query all customers to check for existing email or phone if we do have a match, we will add
+            # the credit card under their cus_ID and then charge the customer
+            existing_stripe_id = (dynamo_select_all_members(form.notificationEmail.data))
+            print("existing stripe_id", existing_stripe_id)
+            if existing_stripe_id is False:
 
-                    try:
-                        # ADD new info to local DB
-                        member = (form.memberName.data, form.phoneNumber.data, form.notificationEmail.data,
-                                  form.location.data)
-                        cus_comm_save(conn, member)
-
-                    except Exception as e:
-                        return render_template('donate-response.html', exception_message="Hata olustu", e=e)
-
-                else:
+                try:
+                    # ADD new info to local DB
                     member = (form.memberName.data, form.phoneNumber.data, form.notificationEmail.data,
                               form.location.data)
-                    cus_name_phone_save(conn, member)
+                    dynamo_cus_comm_save(member)
+
+                except Exception as e:
+                    return render_template('donate-response.html', exception_message="Error Occurred...", e=e)
 
             else:
-                return render_template('signup-response.html', exception="Email Mecburi")
+                member = (form.memberName.data, form.phoneNumber.data, form.notificationEmail.data,
+                          form.location.data)
+                dynamo_cus_name_phone_save(member)
 
-            return render_template('signup-response.html', exception="", isim=form.memberName.data,
-                                   email=form.notificationEmail.data, telefon=form.phoneNumber.data,
-                                   vakif=form.location.data)
+        else:
+            return render_template('signup-response.html', exception="Email is mandatory")
 
-        except Exception as e:
-            return render_template('signup-response.html', exception=e.body)
+        return render_template('signup-response.html', exception="", isim=form.memberName.data,
+                               email=form.notificationEmail.data, telefon=form.phoneNumber.data,
+                               vakif=form.location.data)
+
+    except Exception as e:
+        return render_template('signup-response.html', exception=e)
 
 
 @app.route('/adminlogin', methods=['POST'])
@@ -142,14 +142,18 @@ def iletisim_paneli():
     try:
         conn = create_connection(database)
         with conn:
-            members = get_members(conn)
-            if members is False:
+            #members = get_members(conn)
+            members = dynamo_get_members()
+            if not members:
+            #if members is False:
                 member_count = 0
             else:
-                member_count = len(members)
-            return render_template('iletisim-paneli.html', api_response=members, registered_members=member_count)
+                member_count = members['Count']
+                member_list = members['Items']
+                print(member_list)
+            return render_template('iletisim-paneli.html', api_response=member_list, registered_members=member_count)
+
     except Exception as e:
-        # username=flask_login.current_user.id We can show which user logged in to the panel by sending this to html
         return render_template('login-response.html', exception_message="Hata olustu", e=e)
 
 

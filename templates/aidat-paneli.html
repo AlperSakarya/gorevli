@@ -54,6 +54,7 @@
     $(function() {
       $('a#getDonatingMembers-DC').bind('click', function() {
           var state = "dc";
+          $("#mytable").remove();
          $.ajax({
           url: "/getdonatingmembers",
           type: "POST",
@@ -61,9 +62,8 @@
         }).done(function(data) {
             var resultSet1 = JSON.parse(data);
             $("#donatingMembers").attr('class', 'card card-body collapse show');
-            $("#donatingMembersTable").html("Hello World");
                 var tbl=$("<table/>").attr("id","mytable");
-                $("#donatorTableDC").append(tbl);
+                $("#donatorTable").append(tbl);
                 var thead="<tr><th>Email</th><th>Amount</th><th>Interval</th><th>Date</th></tr>";
                 $("#mytable").append(thead);
                 for(var i=0;i<resultSet1.length;i++)
@@ -82,14 +82,28 @@
     $(function() {
       $('a#getDonatingMembers-NJ').bind('click', function() {
           var state = "nj";
+          $("#mytable").remove();
          $.ajax({
           url: "/getdonatingmembers",
           type: "POST",
           data:{"state":state}
         }).done(function(data) {
-            var result = JSON.parse(data);
+            var resultSet3 = JSON.parse(data);
             $("#donatingMembers").attr('class', 'card card-body collapse show');
-            $("#donatingMembersTable").html("Hello World");
+                var tbl=$("<table/>").attr("id","mytable");
+                $("#donatorTable").append(tbl);
+                var thead="<tr><th>Email</th><th>Amount</th><th>Interval</th><th>Date</th></tr>";
+                $("#mytable").append(thead);
+                for(var i=0;i<resultSet3.length;i++)
+                {
+                    var resultSet4 = JSON.parse(resultSet3[i]);
+                    var tr='<tr>';
+                    var td1='<td>'+resultSet4["email"]+"</td>";
+                    var td2="<td>"+resultSet4["amount"]+"</td>";
+                    var td3="<td>"+resultSet4["interval"]+"</td>";
+                    var td4="<td>"+resultSet4["created"]+"</td></tr>";
+                    $("#mytable").append(tr+td1+td2+td3+td4);
+                }
         });
       });
     });
@@ -117,7 +131,7 @@
 </div>
 <div id="donatingMembers" class="card card-body collapse">
     <h4 class="form-signin-heading" align="center">Paying Members</h4>
-    <div id="donatorTableDC" align="center">
+    <div id="donatorTable" align="center" class="table table-striped">
     </div>
 </div>
 

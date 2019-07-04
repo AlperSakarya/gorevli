@@ -44,10 +44,10 @@
             <tbody>
             {% for member in api_response %}
                 <tr>
-                    <td> {{ member[2] }} </td>
-                    <td> {{ member[3] }} </td>
-                    <td> {{ member[4] }} </td>
-                    <td> {% if member[5] =="nj" %} NJ {% elif member[5] == "dc" %} DC {% endif %}</td>
+                    <td> {{ member['name'] }} </td>
+                    <td> {{ member['phone'] }} </td>
+                    <td> {{ member['email'] }} </td>
+                    <td>{% if member['state'] =="nj" %} NJ {% elif member['state'] == "dc" %} DC {% endif %}</td>
                     <td name="delete">
                         <form action="/deletemember" method="post">
                             <input type="hidden" name="email" value="{{ member[4] }}">
