@@ -68,6 +68,9 @@ def dynamo_delete_comm_member(email):
         Key={'email': email}
     )
 
+
+
+
 #######################################################
 
 

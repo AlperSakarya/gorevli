@@ -143,6 +143,7 @@ def iletisim_paneli():
         conn = create_connection(database)
         with conn:
             members = dynamo_get_members()
+            #print(members)
             if not members:
                 member_count = 0
             else:
@@ -266,26 +267,23 @@ def send_sms_message():
     form = SmsForm()
     sms_message = form.sms_content.data
     location = form.location.data
-    registered_members = 0
-    members = 0
-    conn = create_connection(database)
-
-    with conn:
-        try:
-            members = get_members(conn)
-            member_number = get_member_phones(conn)
-            for number in member_number:
-                number = re.sub("[^0-9]", "", str(number))
-                message = client.api.account.messages.create(to=number, from_=from_number, body=sms_message)
-                registered_members += 1
-                time.sleep(1)
-        except:
-            e = "There was a problem, most likely an invalid number in the member list"
-            return render_template('iletisim-paneli.html', api_response=members, exception=e,
-                                   success_message="SMS was sent to all members!", registered_members=registered_members)
+    try:
+        members = 0
+        registered_members = 0
+        members = dynamo_get_members()['Items']
+        for member in members:
+            number = member['phone']
+            number = re.sub("[^0-9]", "", str(number))
+            message = client.api.account.messages.create(to=number, from_=from_number, body=sms_message)
+            registered_members += 1
+            time.sleep(1)
+    except:
+        e = "There was a problem, most likely an invalid number in the member list"
+        return render_template('iletisim-paneli.html', api_response=members, exception=e,
+                               success_message="SMS was sent to all members!", registered_members=registered_members)
 
     return render_template('iletisim-paneli.html', api_response=members,
-                       success_message="SMS was sent to all members!", registered_members=registered_members)
+                   success_message="SMS was sent to all members!", registered_members=registered_members)
 
 
 @app.route('/charge', methods=['POST'])
