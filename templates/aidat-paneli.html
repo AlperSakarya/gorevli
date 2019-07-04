@@ -92,48 +92,48 @@
             $("#donatingMembers").attr('class', 'card card-body collapse show');
                 var tbl=$("<table/>").attr("id","mytable");
                 $("#donatorTable").append(tbl);
-                var thead="<tr><th>Email</th><th>Amount</th><th>Interval</th><th>Date</th></tr>";
+                var thead="<tr><th>Email</th><th>Amount</th><th>Interval</th><th>Date</th><th>Delete</th></tr>";
                 $("#mytable").append(thead);
                 for(var i=0;i<resultSet3.length;i++)
                 {
                     var resultSet4 = JSON.parse(resultSet3[i]);
-                    var tr='<tr>';
-                    var td1='<td>'+resultSet4["email"]+"</td>";
+                    var tr="<tr>";
+                    var td1="<td>"+resultSet4["email"]+"</td>";
                     var td2="<td>"+resultSet4["amount"]+"</td>";
                     var td3="<td>"+resultSet4["interval"]+"</td>";
-                    var td4="<td>"+resultSet4["created"]+"</td></tr>";
-                    $("#mytable").append(tr+td1+td2+td3+td4);
+                    var td4="<td>"+resultSet4["created"]+"</td>";
+                    var td5="<td><input type=\"submit\" value=\"DELETE\" class=\"btn btn-success btn-xs btn-block\" role=\"button\"></td></tr>";
+                    $("#mytable").append(tr+td1+td2+td3+td4+td5);
                 }
         });
       });
     });
 </script>
 
-  <a id="dc" class="btn btn-success" data-toggle="collapse" href="#dcVakfi" role="button" aria-expanded="false" aria-controls="dcVakfi">
+    <a id="dc" class="btn btn-success" data-toggle="collapse" href="#dcVakfi" role="button" aria-expanded="false" aria-controls="dcVakfi">
     D.C Branch </a>
-  <a id="nj" class="btn btn-success" data-toggle="collapse" href="#njVakfi" role="button" aria-expanded="false" aria-controls="njVakfi">
+    <a id="nj" class="btn btn-success" data-toggle="collapse" href="#njVakfi" role="button" aria-expanded="false" aria-controls="njVakfi">
     N.J Branch </a><p>
 
-<div class="collapse" id="dcVakfi">
-  <div class="card card-body">
-    <p align="center">Total Paying Members: <strong id="dcPayingMembers">{{ registered_members }}</strong><b></b></p>
-    <p id="total-amount" align="center">Total Monthly Recurring: <strong id="dcTotalAmount">${{ total }}</strong><b></b></p>
-    <div> <a id="getDonatingMembers-DC" class="shadow btn btn-success">SHOW MEMBERS</a> </div>
-  </div>
-</div>
-
-<div class="collapse" id="njVakfi">
-  <div class="card card-body">
-    <p align="center">Total Paying Members: <strong id="njPayingMembers">>{{ registered_members }}</strong><b></b></p>
-    <p align="center">Total Monthly Recurring: <strong id="njTotalAmount">>${{ total }}</strong><b></b></p>
-    <div> <a id="getDonatingMembers-NJ" class="shadow btn btn-success">SHOW MEMBERS</a> </div>
-  </div>
-</div>
-<div id="donatingMembers" class="card card-body collapse">
-    <h4 class="form-signin-heading" align="center">Paying Members</h4>
-    <div id="donatorTable" align="center" class="table table-striped">
+    <div class="collapse" id="dcVakfi">
+      <div class="card card-body">
+        <p align="center">Total Paying Members: <strong id="dcPayingMembers">{{ registered_members }}</strong><b></b></p>
+        <p id="total-amount" align="center">Total Monthly Recurring: <strong id="dcTotalAmount">${{ total }}</strong><b></b></p>
+        <div> <a id="getDonatingMembers-DC" class="shadow btn btn-success">SHOW MEMBERS</a> </div>
+      </div>
     </div>
-</div>
+    <div class="collapse" id="njVakfi">
+      <div class="card card-body">
+        <p align="center">Total Paying Members: <strong id="njPayingMembers">>{{ registered_members }}</strong><b></b></p>
+        <p align="center">Total Monthly Recurring: <strong id="njTotalAmount">>${{ total }}</strong><b></b></p>
+        <div> <a id="getDonatingMembers-NJ" class="shadow btn btn-success">SHOW MEMBERS</a> </div>
+      </div>
+    </div>
+    <div id="donatingMembers" class="card card-body collapse">
+        <h4 class="form-signin-heading" align="center">Paying Members</h4>
+        <div id="donatorTable" align="center" class="table table-striped">
+        </div>
+    </div>
 
     <div>
     <a href="/gorevlipaneli" class="shadow btn btn-success btn-lg btn-block">BACK</a>

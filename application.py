@@ -262,7 +262,7 @@ def delete_donator():
 
 @app.route('/send-sms', methods=['POST'])
 def send_sms_message():
-    # List customers from local DB and SMS with Twilio
+    # List customers from DB and SMS with Twilio
     # Setting from number for members
     form = SmsForm()
     sms_message = form.sms_content.data
