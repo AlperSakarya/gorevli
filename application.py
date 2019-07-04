@@ -218,7 +218,7 @@ def delete_member():
         email = request.form['email']
         dynamo_delete_comm_member(email)
         members = dynamo_get_members()
-        print(members)
+        member_list = members['Items']
         if not members:
             member_count = 0
         else:
@@ -226,7 +226,7 @@ def delete_member():
     except Exception as e:
         print(e)
 
-    return render_template('iletisim-paneli.html', api_response=members, registered_members=member_count, e=e)
+    return render_template('iletisim-paneli.html', api_response=member_list, registered_members=member_count, e=e)
 
 
 @app.route('/deletedonator', methods=['POST'])
