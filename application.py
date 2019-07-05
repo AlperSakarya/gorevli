@@ -274,9 +274,10 @@ def send_sms_message():
         for member in members:
             number = member['phone']
             number = re.sub("[^0-9]", "", str(number))
-            message = client.api.account.messages.create(to=number, from_=from_number, body=sms_message)
+            if member['state'] == location:
+                message = client.api.account.messages.create(to=number, from_=from_number, body=sms_message)
+                time.sleep(1)
             registered_members += 1
-            time.sleep(1)
     except:
         e = "There was a problem, most likely an invalid number in the member list"
         return render_template('iletisim-paneli.html', api_response=members, exception=e,
