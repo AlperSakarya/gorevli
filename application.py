@@ -4,7 +4,7 @@ import flask, flask_login
 from flask import Flask, render_template, url_for, request, json
 from forms import signupform, donationform, LoginForm, SmsForm
 import stripe
-import uuid, json, unirest, re, time, datetime, jsonify
+import uuid, json, re, time, datetime 
 import auth  # I pass my access tokens here and import this auth.py file
 from auth import client, auth_token, account_sid, location_id, from_number, access_token,\
     STRIPE_PUBLISHABLE_KEY_NJ, STRIPE_SECRET_KEY_NJ, STRIPE_PUBLISHABLE_KEY_DC, STRIPE_SECRET_KEY_DC, \
